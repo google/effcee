@@ -16,6 +16,7 @@
 
 #include <cassert>
 #include <algorithm>
+#include <memory>
 #include <sstream>
 #include <string>
 #include <utility>
@@ -64,6 +65,11 @@ StringPiece SuffixForType(Type type) {
 }  // namespace
 
 namespace effcee {
+
+std::unique_ptr<Check::Part> Check::Part::MakePart(Check::Part::Type type,
+                                                   StringPiece param) {
+  return std::unique_ptr<Check::Part>(new Check::Part(type, param));
+}
 
 bool Check::Part::Matches(Check::Part::Constraint constraint, StringPiece* str,
                           StringPiece* captured) const {

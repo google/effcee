@@ -65,6 +65,9 @@ class Check {
 
     Part(Type type, StringPiece param) : type_(type), param_(param) {}
 
+    // Returns a new Part with the given parameters.
+    static std::unique_ptr<Part> MakePart(Type type, StringPiece param);
+
     // Tries to match the specified portion of the given string. If successful,
     // returns true, advances |input| past the matched portion, and saves the
     // captured substring in captured. Otherwise returns false and does not
@@ -89,7 +92,7 @@ class Check {
   // contents, so that string storage should remain valid for the duration
   // of this object.
   Check(Type type, StringPiece param) : type_(type), param_(param) {
-    parts_.push_back(make_unique<Part>(Part::Type::Fixed, param));
+    parts_.push_back(Part::MakePart(Part::Type::Fixed, param));
   }
 
   // Move constructor.
