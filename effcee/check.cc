@@ -72,6 +72,11 @@ std::unique_ptr<Check::Part> Check::Part::MakePart(
   return std::unique_ptr<Check::Part>(new Check::Part(constraint, type, param));
 }
 
+Check::Check(Type type, StringPiece param) : type_(type), param_(param) {
+  parts_.push_back(
+      Part::MakePart(Part::Constraint::Substring, Part::Type::Fixed, param));
+}
+
 bool Check::Part::Matches(StringPiece* str, StringPiece* captured) const {
   // TODO(dneto): Handle other constraints and types.
   assert(type_ == Type::Fixed);
@@ -94,26 +99,27 @@ bool Check::Part::Matches(StringPiece* str, StringPiece* captured) const {
   return true;
 }
 
+std::string Check::Part::Regex() {
+  switch (type_) {
+    case Type::Fixed:
+      return RE2::QuoteMeta(param_);
+    case Type::Regex:
+      return std::string(param_.data(), param_.size());
+  }
+}
+
 bool Check::Matches(StringPiece* input, StringPiece* captured) const {
   // This is not valid to call on default-constructed instance.
   assert(!parts_.empty());
 
-  StringPiece local_input = *input;
-  StringPiece first_capture;
-  StringPiece last_capture;
-  const auto num_parts = parts_.size();
-  for (size_t i = 0; i < num_parts; ++i) {
-    StringPiece capture;
-    if (!parts_[i]->Matches(&local_input, &capture)) return false;
-    if (i == 0) first_capture = capture;
-    if (i == num_parts - 1) last_capture = capture;
+  std::ostringstream consume_regex;
+  consume_regex << "(";
+  for (auto& part : parts_) {
+    consume_regex << part->Regex();
   }
+  consume_regex << ")";
 
-  // Matching succeeded.  Write back results.
-  *input = local_input;
-  *captured = StringPiece(first_capture.begin(),
-                          last_capture.end() - first_capture.begin());
-  return true;
+  return RE2::FindAndConsume(input, consume_regex.str(), captured);
 }
 
 std::string Check::Description(const Options& options) const {
@@ -160,7 +166,30 @@ std::pair<Result, CheckList> ParseChecks(StringPiece str,
     StringPiece suffix;
     if (RE2::PartialMatch(line, regexp, &suffix, &matched_param)) {
       const Type type = TypeForSuffix(suffix);
-      check_list.push_back(Check(type, matched_param));
+
+      Check::Parts parts;
+      StringPiece param = matched_param;
+      StringPiece fixed, regex;
+      auto constraint = [&parts]() {
+        return parts.empty() ? Check::Part::Constraint::Substring
+                             : Check::Part::Constraint::Prefix;
+      };
+      while (RE2::Consume(&param, "(.*?){{(.*?)}}", &fixed, &regex)) {
+        if (!fixed.empty()) {
+          parts.push_back(Check::Part::MakePart(
+              constraint(), Check::Part::Type::Fixed, fixed));
+        }
+        if (!regex.empty()) {
+          parts.push_back(Check::Part::MakePart(
+              constraint(), Check::Part::Type::Regex, regex));
+        }
+      }
+      if (!param.empty()) {
+        parts.push_back(Check::Part::MakePart(constraint(),
+                                              Check::Part::Type::Fixed, param));
+      }
+
+      check_list.push_back(Check(type, matched_param, std::move(parts)));
     }
     cursor.AdvanceLine();
   }

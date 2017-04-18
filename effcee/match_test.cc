@@ -659,7 +659,82 @@ Delicious Honey
 }
 
 
-// TODO: Regexp
+// Regexp
+
+TEST(Match, CheckRegexPass) {
+  const auto result = Match("Hello", "CHECK: He{{ll}}o");
+  EXPECT_TRUE(result) << result.message();
+}
+
+TEST(Match, CheckRegexWithFalseStartPass) {
+  // This examples has three false starts.  That is, we match the first
+  // few parts of the pattern before we finally match it.
+  const auto result = Match("He Hel Hell Hello Helloo", "CHECK: He{{ll}}oo");
+  EXPECT_TRUE(result) << result.message();
+}
+
+TEST(Match, CheckRegexWithRangePass) {
+  const auto result = Match("Hello", "CHECK: He{{[a-z]+}}o");
+  EXPECT_TRUE(result) << result.message();
+}
+
+TEST(Match, CheckRegexMatchesEmptyPass) {
+  const auto result = Match("Heo", "CHECK: He{{[a-z]*}}o");
+  EXPECT_TRUE(result) << result.message();
+}
+
+TEST(Match, CheckThreeRegexPass) {
+  // This proves that we parsed the check correctly, finding matching pairs
+  // of regexp delimiters {{ and }}.
+  const auto result = Match("Hello World", "CHECK: He{{[a-z]+}}o{{ +}}{{[Ww]}}orld");
+  EXPECT_TRUE(result) << result.message();
+}
+
+TEST(Match, CheckRegexFail) {
+  const auto result = Match("Heo", "CHECK: He{{[a-z]*}}o");
+  EXPECT_TRUE(result) << result.message();
+}
+
+TEST(Match, MessageStringRegexRegexWithFalseStartFail) {
+  const char* input = "He Hel Hell Hello Hello";
+  const char* checks = "CHECK: He{{ll}}oo";
+  const char* expected = R"(chklist:1:8: error: expected string not found in input
+CHECK: He{{ll}}oo
+       ^
+myin.txt:1:1: note: scanning from here
+He Hel Hell Hello Hello
+^
+)";
+  const auto result =
+      Match(input, checks,
+            Options().SetInputName("myin.txt").SetChecksName("chklist"));
+  EXPECT_FALSE(result);
+  EXPECT_THAT(result.message(), Eq(expected)) << result.message();
+}
+
+TEST(Match, MessageStringRegexNotFoundWhenNeverMatchedAnything) {
+  const char* input = R"(Begin
+Hello
+ World)";
+  const char* checks = R"(
+Hello
+  ;  CHECK: He{{[0-9]+}}llo
+)";
+  const char* expected = R"(chklist:3:13: error: expected string not found in input
+  ;  CHECK: He{{[0-9]+}}llo
+            ^
+myin.txt:1:1: note: scanning from here
+Begin
+^
+)";
+  const auto result =
+      Match(input, checks,
+            Options().SetInputName("myin.txt").SetChecksName("chklist"));
+  EXPECT_FALSE(result);
+  EXPECT_THAT(result.message(), Eq(expected)) << result.message();
+}
+
+
 // TODO: Stateful
 
 }  // namespace

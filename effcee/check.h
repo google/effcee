@@ -56,6 +56,7 @@ class Check {
 
     enum class Type {
       Fixed,  // A fixed string: characters are matched exactly, in sequence.
+      Regex,  // A regular expression
     };
 
     Part(Constraint constraint, Type type, StringPiece param)
@@ -70,6 +71,10 @@ class Check {
     // captured substring in captured. Otherwise returns false and does not
     // update |input| or |captured|.
     bool Matches(StringPiece* input, StringPiece* captured) const;
+
+    // Returns a regular expression to match this part.  If this part is a
+    // fixed string then quoting has been applied.
+    std::string Regex();
 
    private:
     // The constraint on what part of the input should match.
@@ -90,10 +95,12 @@ class Check {
   // In particular, this retains a StringPiece reference to the |param|
   // contents, so that string storage should remain valid for the duration
   // of this object.
-  Check(Type type, StringPiece param) : type_(type), param_(param) {
-    parts_.push_back(
-        Part::MakePart(Part::Constraint::Substring, Part::Type::Fixed, param));
-  }
+  Check(Type type, StringPiece param);
+
+  // Construct a Check object of the given type, with given parameter string
+  // and specified parts.
+  Check(Type type, StringPiece param, Parts&& parts)
+      : type_(type), param_(param), parts_(std::move(parts)) {}
 
   // Move constructor.
   Check(Check&& other) : type_(other.type_), param_(other.param_) {

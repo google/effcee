@@ -21,7 +21,6 @@
 namespace effcee {
 
 // TODO(dneto): Describe example usage.
-// TODO(dneto): Handle regexps
 // TODO(dneto): Support statefulness: capturing variables
 
 // This does not implement the equivalents of FileCheck options:
