@@ -66,22 +66,30 @@ StringPiece SuffixForType(Type type) {
 
 namespace effcee {
 
-std::unique_ptr<Check::Part> Check::Part::MakePart(Check::Part::Type type,
-                                                   StringPiece param) {
-  return std::unique_ptr<Check::Part>(new Check::Part(type, param));
+std::unique_ptr<Check::Part> Check::Part::MakePart(
+    Check::Part::Constraint constraint, Check::Part::Type type,
+    StringPiece param) {
+  return std::unique_ptr<Check::Part>(new Check::Part(constraint, type, param));
 }
 
-bool Check::Part::Matches(Check::Part::Constraint constraint, StringPiece* str,
-                          StringPiece* captured) const {
+bool Check::Part::Matches(StringPiece* str, StringPiece* captured) const {
   // TODO(dneto): Handle other constraints and types.
-  assert(constraint == Constraint::Substring);
   assert(type_ == Type::Fixed);
-  auto where = str->find(param_);
-  if (where == StringPiece::npos) {
-    return false;
-  } else {
-    *captured = str->substr(where, param_.size());
-    str->remove_prefix(where + param_.size());
+  switch (constraint_) {
+    case Constraint::Prefix:
+      if (!str->starts_with(param_)) return false;
+      *captured = str->substr(0, param_.size());
+      str->remove_prefix(param_.size());
+      break;
+    case Constraint::Substring: {
+      auto where = str->find(param_);
+      if (where == StringPiece::npos) {
+        return false;
+      } else {
+        *captured = str->substr(where, param_.size());
+        str->remove_prefix(where + param_.size());
+      }
+    } break;
   }
   return true;
 }
@@ -95,11 +103,8 @@ bool Check::Matches(StringPiece* input, StringPiece* captured) const {
   StringPiece last_capture;
   const auto num_parts = parts_.size();
   for (size_t i = 0; i < num_parts; ++i) {
-    const auto constraint = Constraint(
-        ((i == 0) ? int(Constraint::MaySkipLeading) : 0) |
-        ((i == num_parts - 1) ? int(Constraint::MaySkipTrailing) : 0));
     StringPiece capture;
-    if (!parts_[i]->Matches(constraint, &local_input, &capture)) return false;
+    if (!parts_[i]->Matches(&local_input, &capture)) return false;
     if (i == 0) first_capture = capture;
     if (i == num_parts - 1) last_capture = capture;
   }

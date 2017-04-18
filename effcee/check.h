@@ -50,31 +50,30 @@ class Check {
    public:
     // A Constraint describes what part of the input string is matched.
     enum class Constraint {
-      Whole = 0,  // Must match the whole input
-      SkipNone = Whole,
-      Suffix = 1,  // Can skip leading characters
-      MaySkipLeading = Suffix,
-      Prefix = 2,  // Can skip trailing characters
-      MaySkipTrailing = Prefix,
-      Substring = 3,  // Can skip both leading and trailing characters
+      Substring,  // Can skip some leading characters before matching.
+      Prefix,     // Match the beginning of the string.
     };
 
     enum class Type {
       Fixed,  // A fixed string: characters are matched exactly, in sequence.
     };
 
-    Part(Type type, StringPiece param) : type_(type), param_(param) {}
+    Part(Constraint constraint, Type type, StringPiece param)
+        : constraint_(constraint), type_(type), param_(param) {}
 
     // Returns a new Part with the given parameters.
-    static std::unique_ptr<Part> MakePart(Type type, StringPiece param);
+    static std::unique_ptr<Part> MakePart(Constraint constraint, Type type,
+                                          StringPiece param);
 
     // Tries to match the specified portion of the given string. If successful,
     // returns true, advances |input| past the matched portion, and saves the
     // captured substring in captured. Otherwise returns false and does not
     // update |input| or |captured|.
-    bool Matches(Constraint, StringPiece* input, StringPiece* captured) const;
+    bool Matches(StringPiece* input, StringPiece* captured) const;
 
    private:
+    // The constraint on what part of the input should match.
+    Constraint constraint_;
     // The part type.
     Type type_;
     // The part parameter.
@@ -92,7 +91,8 @@ class Check {
   // contents, so that string storage should remain valid for the duration
   // of this object.
   Check(Type type, StringPiece param) : type_(type), param_(param) {
-    parts_.push_back(Part::MakePart(Part::Type::Fixed, param));
+    parts_.push_back(
+        Part::MakePart(Part::Constraint::Substring, Part::Type::Fixed, param));
   }
 
   // Move constructor.
