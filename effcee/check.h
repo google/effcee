@@ -48,37 +48,22 @@ class Check {
   // distinguished by how it matches against input.
   class Part {
    public:
-    // A Constraint describes what part of the input string is matched.
-    enum class Constraint {
-      Substring,  // Can skip some leading characters before matching.
-      Prefix,     // Match the beginning of the string.
-    };
 
     enum class Type {
       Fixed,  // A fixed string: characters are matched exactly, in sequence.
       Regex,  // A regular expression
     };
 
-    Part(Constraint constraint, Type type, StringPiece param)
-        : constraint_(constraint), type_(type), param_(param) {}
+    Part(Type type, StringPiece param) : type_(type), param_(param) {}
 
     // Returns a new Part with the given parameters.
-    static std::unique_ptr<Part> MakePart(Constraint constraint, Type type,
-                                          StringPiece param);
-
-    // Tries to match the specified portion of the given string. If successful,
-    // returns true, advances |input| past the matched portion, and saves the
-    // captured substring in captured. Otherwise returns false and does not
-    // update |input| or |captured|.
-    bool Matches(StringPiece* input, StringPiece* captured) const;
+    static std::unique_ptr<Part> MakePart(Type type, StringPiece param);
 
     // Returns a regular expression to match this part.  If this part is a
     // fixed string then quoting has been applied.
     std::string Regex();
 
    private:
-    // The constraint on what part of the input should match.
-    Constraint constraint_;
     // The part type.
     Type type_;
     // The part parameter.

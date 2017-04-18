@@ -24,7 +24,6 @@
 #include "cursor.h"
 #include "effcee.h"
 
-using Constraint = effcee::Check::Part::Constraint;
 using Status = effcee::Result::Status;
 using StringPiece = effcee::StringPiece;
 using Type = effcee::Check::Type;
@@ -66,37 +65,13 @@ StringPiece SuffixForType(Type type) {
 
 namespace effcee {
 
-std::unique_ptr<Check::Part> Check::Part::MakePart(
-    Check::Part::Constraint constraint, Check::Part::Type type,
-    StringPiece param) {
-  return std::unique_ptr<Check::Part>(new Check::Part(constraint, type, param));
+std::unique_ptr<Check::Part> Check::Part::MakePart(Check::Part::Type type,
+                                                   StringPiece param) {
+  return std::unique_ptr<Check::Part>(new Check::Part(type, param));
 }
 
 Check::Check(Type type, StringPiece param) : type_(type), param_(param) {
-  parts_.push_back(
-      Part::MakePart(Part::Constraint::Substring, Part::Type::Fixed, param));
-}
-
-bool Check::Part::Matches(StringPiece* str, StringPiece* captured) const {
-  // TODO(dneto): Handle other constraints and types.
-  assert(type_ == Type::Fixed);
-  switch (constraint_) {
-    case Constraint::Prefix:
-      if (!str->starts_with(param_)) return false;
-      *captured = str->substr(0, param_.size());
-      str->remove_prefix(param_.size());
-      break;
-    case Constraint::Substring: {
-      auto where = str->find(param_);
-      if (where == StringPiece::npos) {
-        return false;
-      } else {
-        *captured = str->substr(where, param_.size());
-        str->remove_prefix(where + param_.size());
-      }
-    } break;
-  }
-  return true;
+  parts_.push_back(Part::MakePart(Part::Type::Fixed, param));
 }
 
 std::string Check::Part::Regex() {
@@ -170,23 +145,18 @@ std::pair<Result, CheckList> ParseChecks(StringPiece str,
       Check::Parts parts;
       StringPiece param = matched_param;
       StringPiece fixed, regex;
-      auto constraint = [&parts]() {
-        return parts.empty() ? Check::Part::Constraint::Substring
-                             : Check::Part::Constraint::Prefix;
-      };
       while (RE2::Consume(&param, "(.*?){{(.*?)}}", &fixed, &regex)) {
         if (!fixed.empty()) {
-          parts.push_back(Check::Part::MakePart(
-              constraint(), Check::Part::Type::Fixed, fixed));
+          parts.push_back(
+              Check::Part::MakePart(Check::Part::Type::Fixed, fixed));
         }
         if (!regex.empty()) {
-          parts.push_back(Check::Part::MakePart(
-              constraint(), Check::Part::Type::Regex, regex));
+          parts.push_back(
+              Check::Part::MakePart(Check::Part::Type::Regex, regex));
         }
       }
       if (!param.empty()) {
-        parts.push_back(Check::Part::MakePart(constraint(),
-                                              Check::Part::Type::Fixed, param));
+        parts.push_back(Check::Part::MakePart(Check::Part::Type::Fixed, param));
       }
 
       check_list.push_back(Check(type, matched_param, std::move(parts)));

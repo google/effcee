@@ -323,80 +323,28 @@ TEST(CheckDescription, Samples) {
               Eq("Boo-NEXT: it"));
 }
 
-// Check::Part::MakePart
-TEST(CheckPart, FixedPartPrefixMatchesPass) {
-  auto part =
-      Part::MakePart(Part::Constraint::Prefix, Part::Type::Fixed, "abc");
-  StringPiece input = "abcdef";
-  StringPiece input2 = input;
-  StringPiece captured;
-  const bool matched = part->Matches(&input, &captured);
-  EXPECT_TRUE(matched);
-  EXPECT_THAT(input.data(), Eq(input2.data() + 3));
-  EXPECT_THAT(input, Eq("def"));
-  EXPECT_THAT(captured, Eq("abc"));
-  EXPECT_THAT(captured.data(), Eq(input2.data()));
+// Check::Part::Regex
+
+TEST(CheckPart, FixedPartRegex) {
+  EXPECT_THAT(Part(Part::Type::Fixed, "abc").Regex(), Eq("abc"));
+  EXPECT_THAT(Part(Part::Type::Fixed, "a.bc").Regex(), Eq("a\\.bc"));
+  EXPECT_THAT(Part(Part::Type::Fixed, "a?bc").Regex(), Eq("a\\?bc"));
+  EXPECT_THAT(Part(Part::Type::Fixed, "a+bc").Regex(), Eq("a\\+bc"));
+  EXPECT_THAT(Part(Part::Type::Fixed, "a*bc").Regex(), Eq("a\\*bc"));
+  EXPECT_THAT(Part(Part::Type::Fixed, "a[b]").Regex(), Eq("a\\[b\\]"));
+  EXPECT_THAT(Part(Part::Type::Fixed, "a[-]").Regex(), Eq("a\\[\\-\\]"));
+  EXPECT_THAT(Part(Part::Type::Fixed, "a(-)b").Regex(), Eq("a\\(\\-\\)b"));
 }
 
-TEST(CheckPart, FixedPartPrefixMatchesFail) {
-  auto part =
-      Part::MakePart(Part::Constraint::Prefix, Part::Type::Fixed, "abc");
-  StringPiece input = "zeroabcdef";
-  StringPiece input2 = input;
-  StringPiece captured = "foo";
-  StringPiece captured2 = captured;
-  const bool matched = part->Matches(&input, &captured);
-  EXPECT_FALSE(matched);
-  // The string pieces have not changed.
-  EXPECT_THAT(input, Eq(input2));
-  EXPECT_THAT(input.data(), Eq(input2.data()));
-  EXPECT_THAT(captured, Eq(captured2));
-  EXPECT_THAT(captured.data(), Eq(captured2.data()));
-}
-
-// Check::Part::MakePart
-TEST(CheckPart, FixedPartSubstringMatchesPrefixPass) {
-  auto part =
-      Part::MakePart(Part::Constraint::Substring, Part::Type::Fixed, "abc");
-  StringPiece input = "abcdef";
-  StringPiece input2 = input;
-  StringPiece captured;
-  const bool matched = part->Matches(&input, &captured);
-  EXPECT_TRUE(matched);
-  EXPECT_THAT(input.data(), Eq(input2.data() + 3));
-  EXPECT_THAT(input, Eq("def"));
-  EXPECT_THAT(captured, Eq("abc"));
-  EXPECT_THAT(captured.data(), Eq(input2.data()));
-}
-
-TEST(CheckPart, FixedPartSubstringMatchesSubstringPass) {
-  auto part =
-      Part::MakePart(Part::Constraint::Substring, Part::Type::Fixed, "abc");
-  StringPiece input = "zeroabcdef";
-  StringPiece input2 = input;
-  StringPiece captured;
-  const bool matched = part->Matches(&input, &captured);
-  EXPECT_TRUE(matched);
-  EXPECT_THAT(input.data(), Eq(input2.data() + 7));
-  EXPECT_THAT(input, Eq("def"));
-  EXPECT_THAT(captured, Eq("abc"));
-  EXPECT_THAT(captured.data(), Eq(input2.data() + 4));
-}
-
-TEST(CheckPart, FixedPartSubstringMatchFail) {
-  auto part =
-      Part::MakePart(Part::Constraint::Substring, Part::Type::Fixed, "abc");
-  StringPiece input = "goop";
-  StringPiece input2 = input;
-  StringPiece captured = "foo";
-  StringPiece captured2 = captured;
-  const bool matched = part->Matches(&input, &captured);
-  EXPECT_FALSE(matched);
-  // The string pieces have not changed.
-  EXPECT_THAT(input, Eq(input2));
-  EXPECT_THAT(input.data(), Eq(input2.data()));
-  EXPECT_THAT(captured, Eq(captured2));
-  EXPECT_THAT(captured.data(), Eq(captured2.data()));
+TEST(CheckPart, RegexPartRegex) {
+  EXPECT_THAT(Part(Part::Type::Regex, "abc").Regex(), Eq("abc"));
+  EXPECT_THAT(Part(Part::Type::Regex, "a.bc").Regex(), Eq("a.bc"));
+  EXPECT_THAT(Part(Part::Type::Regex, "a?bc").Regex(), Eq("a?bc"));
+  EXPECT_THAT(Part(Part::Type::Regex, "a+bc").Regex(), Eq("a+bc"));
+  EXPECT_THAT(Part(Part::Type::Regex, "a*bc").Regex(), Eq("a*bc"));
+  EXPECT_THAT(Part(Part::Type::Regex, "a[b]").Regex(), Eq("a[b]"));
+  EXPECT_THAT(Part(Part::Type::Regex, "a[-]").Regex(), Eq("a[-]"));
+  EXPECT_THAT(Part(Part::Type::Regex, "a(-)b").Regex(), Eq("a(-)b"));
 }
 
 }  // namespace
