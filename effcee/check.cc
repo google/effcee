@@ -23,6 +23,7 @@
 
 #include "cursor.h"
 #include "effcee.h"
+#include "make_unique.h"
 
 using Status = effcee::Result::Status;
 using StringPiece = effcee::StringPiece;
@@ -65,36 +66,69 @@ StringPiece SuffixForType(Type type) {
 
 namespace effcee {
 
-std::unique_ptr<Check::Part> Check::Part::MakePart(Check::Part::Type type,
-                                                   StringPiece param) {
-  return std::unique_ptr<Check::Part>(new Check::Part(type, param));
+int Check::Part::CountCapturingGroups() {
+  if (type_ == Type::Regex) return RE2(param_).NumberOfCapturingGroups();
+  if (type_ == Type::VarDef) return RE2(expression_).NumberOfCapturingGroups();
+  return 0;
 }
 
 Check::Check(Type type, StringPiece param) : type_(type), param_(param) {
-  parts_.push_back(Part::MakePart(Part::Type::Fixed, param));
+  parts_.push_back(make_unique<Check::Part>(Part::Type::Fixed, param));
 }
 
-std::string Check::Part::Regex() {
+std::string Check::Part::Regex(const VarMapping& vars) const {
   switch (type_) {
     case Type::Fixed:
       return RE2::QuoteMeta(param_);
     case Type::Regex:
-      return std::string(param_.data(), param_.size());
+      return param_.as_string();
+    case Type::VarDef:
+      return std::string("(") + expression_.as_string() + ")";
+    case Type::VarUse: {
+      auto where = vars.find(VarUseName().as_string());
+      if (where != vars.end()) {
+        // Return the escaped form of the current value of the variable.
+        return RE2::QuoteMeta((*where).second);
+      } else {
+        // The variable is not yet set.
+        return "";
+      }
+    }
   }
+  return ""; // Unreachable.  But we need to satisfy GCC.
 }
 
-bool Check::Matches(StringPiece* input, StringPiece* captured) const {
-  // This is not valid to call on default-constructed instance.
-  assert(!parts_.empty());
+bool Check::Matches(StringPiece* input, StringPiece* captured,
+                    VarMapping* vars) const {
+  if (parts_.empty()) return false;
+
+  std::unordered_map<int, std::string> var_def_indices;
 
   std::ostringstream consume_regex;
-  consume_regex << "(";
+  int num_captures = 1;  // The outer capture.
   for (auto& part : parts_) {
-    consume_regex << part->Regex();
+    consume_regex << part->Regex(*vars);
+    const auto var_def_name = part->VarDefName();
+    if (!var_def_name.empty()) {
+      var_def_indices[num_captures++] = var_def_name.as_string();
+    }
+    num_captures += part->NumCapturingGroups();
   }
-  consume_regex << ")";
+  std::unique_ptr<StringPiece[]> captures(new StringPiece[num_captures]);
+  const bool matched = RE2(consume_regex.str())
+                           .Match(*input, 0, input->size(), RE2::UNANCHORED,
+                                  captures.get(), num_captures);
+  if (matched) {
+    *captured = captures[0];
+    input->remove_prefix(captured->end() - input->begin());
+    // Update the variable mapping.
+    for (auto& var_def_index : var_def_indices) {
+      const int index = var_def_index.first;
+      (*vars)[var_def_index.second] = captures[index].as_string();
+    }
+  }
 
-  return RE2::FindAndConsume(input, consume_regex.str(), captured);
+  return matched;
 }
 
 std::string Check::Description(const Options& options) const {
@@ -102,6 +136,67 @@ std::string Check::Description(const Options& options) const {
   out << options.prefix() << SuffixForType(type()) << ": " << param();
   return out.str();
 }
+
+namespace {
+// Returns a parts list for the given pattern.  This splits out regular expressions as
+// delimited by {{ and }}, and also variable uses and definitions.
+Check::Parts PartsForPattern(StringPiece pattern) {
+  Check::Parts parts;
+  StringPiece fixed, regex, var;
+
+  using Type = Check::Part::Type;
+
+  while (!pattern.empty()) {
+    const auto regex_start = pattern.find("{{");
+    const auto regex_end = pattern.find("}}");
+    const auto var_start = pattern.find("[[");
+    const auto var_end = pattern.find("]]");
+    const bool regex_exists =
+        regex_start < regex_end && regex_end < StringPiece::npos;
+    const bool var_exists = var_start < var_end && var_end < StringPiece::npos;
+
+    if (regex_exists && (!var_exists || regex_start < var_start)) {
+      const auto consumed =
+          RE2::Consume(&pattern, "(.*?){{(.*?)}}", &fixed, &regex);
+      assert(consumed &&
+             "Did not make forward progress for regex in check rule");
+      if (!fixed.empty()) {
+        parts.emplace_back(make_unique<Check::Part>(Type::Fixed, fixed));
+      }
+      if (!regex.empty()) {
+        parts.emplace_back(make_unique<Check::Part>(Type::Regex, regex));
+      }
+    } else if (var_exists && (!regex_exists || var_start < regex_start)) {
+      const auto consumed =
+          RE2::Consume(&pattern, "(.*?)\\[\\[(.*?)\\]\\]", &fixed, &var);
+      assert(consumed && "Did not make forward progress for var in check rule");
+      if (!fixed.empty()) {
+        parts.emplace_back(make_unique<Check::Part>(Type::Fixed, fixed));
+      }
+      if (!var.empty()) {
+        auto colon = var.find(":");
+        // A colon at the end is useless anyway, so just make it a variable
+        // use.
+        if (colon == StringPiece::npos || colon == var.size() - 1) {
+          parts.emplace_back(make_unique<Check::Part>(Type::VarUse, var));
+        } else {
+          StringPiece name = var.substr(0, colon);
+          StringPiece expression = var.substr(colon + 1, StringPiece::npos);
+          parts.emplace_back(
+              make_unique<Check::Part>(Type::VarDef, var, name, expression));
+        }
+      }
+    } else {
+      // There is no regex, no var def, no var use.  Must be a fixed string.
+      parts.push_back(make_unique<Check::Part>(Type::Fixed, pattern));
+      break;
+    }
+  }
+
+  return parts;
+}
+
+}  // anonymous
 
 std::pair<Result, CheckList> ParseChecks(StringPiece str,
                                          const Options& options) {
@@ -141,24 +236,7 @@ std::pair<Result, CheckList> ParseChecks(StringPiece str,
     StringPiece suffix;
     if (RE2::PartialMatch(line, regexp, &suffix, &matched_param)) {
       const Type type = TypeForSuffix(suffix);
-
-      Check::Parts parts;
-      StringPiece param = matched_param;
-      StringPiece fixed, regex;
-      while (RE2::Consume(&param, "(.*?){{(.*?)}}", &fixed, &regex)) {
-        if (!fixed.empty()) {
-          parts.push_back(
-              Check::Part::MakePart(Check::Part::Type::Fixed, fixed));
-        }
-        if (!regex.empty()) {
-          parts.push_back(
-              Check::Part::MakePart(Check::Part::Type::Regex, regex));
-        }
-      }
-      if (!param.empty()) {
-        parts.push_back(Check::Part::MakePart(Check::Part::Type::Fixed, param));
-      }
-
+      auto parts(PartsForPattern(matched_param));
       check_list.push_back(Check(type, matched_param, std::move(parts)));
     }
     cursor.AdvanceLine();
@@ -170,6 +248,7 @@ std::pair<Result, CheckList> ParseChecks(StringPiece str,
         std::string("No check rules specified. Looking for prefix ") +
             options.prefix());
   }
+
   if (check_list[0].type() == Type::Same) {
     return failure(Status::BadRule, std::string(options.prefix()) +
                                         "-SAME can't be the first check rule");

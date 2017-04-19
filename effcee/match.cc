@@ -34,6 +34,10 @@ Result Match(StringPiece input, StringPiece checks, const Options& options) {
   const auto& parse_result = ParseChecks(checks, options);
   if (!parse_result.first) return parse_result.first;
 
+  // A mapping from variable names to values.  This is updated when a check rule
+  // matches a variable definition.
+  VarMapping vars;
+
   // We think of the input string as a sequence of lines that can satisfy
   // the checks.  Walk through the rules until no unsatisfied checks are left.
   // We will erase a check when it has been satisifed.
@@ -83,6 +87,21 @@ Result Match(StringPiece input, StringPiece checks, const Options& options) {
     out << options.input_name() << LineMessage(input, where, message);
     return out.str();
   };
+  // Returns a string describing the value of each variable use in the
+  // given check, in the context of the |where| portion of the input line.
+  auto var_notes = [&input_msg, &vars](StringPiece where, const Check& check) {
+    std::ostringstream out;
+    for (const auto& part : check.parts()) {
+      const auto var_use = part->VarUseName();
+      if (!var_use.empty()) {
+        std::ostringstream phrase;
+        phrase << "note: with variable \"" << var_use << "\" equal to \""
+               << vars[var_use.as_string()] << "\"";
+        out << input_msg(where, phrase.str());
+      }
+    }
+    return out.str();
+  };
 
   // For each line.
   for (; !cursor.Exhausted(); cursor.AdvanceLine()) {
@@ -118,13 +137,14 @@ Result Match(StringPiece input, StringPiece checks, const Options& options) {
         StringPiece unconsumed = rest_of_line;
         StringPiece captured;
 
-        if (check.Matches(&unconsumed, &captured)) {
+        if (check.Matches(&unconsumed, &captured, &vars)) {
           if (check.type() == Type::Not) {
             return fail() << input_msg(captured,
                                        "error: CHECK-NOT: string occurred!")
                           << check_msg(
                                  check.param(),
-                                 "note: CHECK-NOT: pattern specified here");
+                                 "note: CHECK-NOT: pattern specified here")
+                          << var_notes(captured, check);
           }
 
           if (check.type() == Type::Same &&
@@ -146,7 +166,8 @@ Result Match(StringPiece input, StringPiece checks, const Options& options) {
                                   "previous match")
                      << input_msg(captured, "note: 'next' match was here")
                      << input_msg(previous_match_end,
-                                  "note: previous match ended here");
+                                  "note: previous match ended here")
+                     << var_notes(previous_match_end, check);
             }
             if (cursor.line_num() > 1 + matched_line_num) {
               // This must be valid since there was an intervening line.
@@ -165,7 +186,8 @@ Result Match(StringPiece input, StringPiece checks, const Options& options) {
                                   "note: previous match ended here")
                      << input_msg(non_match,
                                   "note: non-matching line after previous "
-                                  "match is here");
+                                  "match is here")
+                     << var_notes(previous_match_end, check);
             }
           }
 
@@ -176,7 +198,8 @@ Result Match(StringPiece input, StringPiece checks, const Options& options) {
                           << input_msg(previous_match_end,
                                        "note: scanning from here")
                           << input_msg(captured,
-                                       "note: next check matches here");
+                                       "note: next check matches here")
+                          << var_notes(previous_match_end, check);
           }
 
           resolved[i] = true;
@@ -230,7 +253,8 @@ Result Match(StringPiece input, StringPiece checks, const Options& options) {
 
     return fail() << check_msg(check.param(),
                                "error: expected string not found in input")
-                  << input_msg(previous_match_end, "note: scanning from here");
+                  << input_msg(previous_match_end, "note: scanning from here")
+                  << var_notes(previous_match_end, check);
   }
 
   return Result(Result::Status::Ok);

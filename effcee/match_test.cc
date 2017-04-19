@@ -58,6 +58,12 @@ TEST(Match, TwoSimpleChecksPass) {
   EXPECT_TRUE(result) << result.message();
 }
 
+TEST(Match, RepeatedCheckFails) {
+  const auto result = Match("Hello\nWorld", "CHECK: Hello\nCHECK: Hello");
+  EXPECT_FALSE(result) << result.message();
+  EXPECT_THAT(result.message(), HasSubstr(kNotFound));
+}
+
 TEST(Match, TwoSimpleChecksPassWithSurroundingText) {
   const auto input = R"(Say
                         Hello
@@ -735,6 +741,12 @@ Begin
 }
 
 
-// TODO: Stateful
+// TODO: Statefulness: variable definitions and uses
+
+TEST(Match, VarDefFollowedByUse) {
+  const auto result =
+      Match("Hello\nHello", "CHECK: H[[X:[a-z]+]]o\nCHECK-NEXT: H[[X]]o");
+  EXPECT_TRUE(result) << result.message();
+}
 
 }  // namespace

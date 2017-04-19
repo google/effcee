@@ -17,6 +17,7 @@
 
 #include <memory>
 #include <string>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -24,6 +25,9 @@
 #include "make_unique.h"
 
 namespace effcee {
+
+// A mapping from a name to a string value.
+using VarMapping = std::unordered_map<std::string, std::string>;
 
 // A single check indicating something to be matched.
 //
@@ -48,33 +52,72 @@ class Check {
   // distinguished by how it matches against input.
   class Part {
    public:
-
     enum class Type {
-      Fixed,  // A fixed string: characters are matched exactly, in sequence.
-      Regex,  // A regular expression
+      Fixed,   // A fixed string: characters are matched exactly, in sequence.
+      Regex,   // A regular expression
+      VarDef,  // A variable definition
+      VarUse,  // A variable use
     };
 
-    Part(Type type, StringPiece param) : type_(type), param_(param) {}
+    Part(Type type, StringPiece param)
+        : type_(type),
+          param_(param),
+          name_(),
+          expression_(),
+          num_capturing_groups_(CountCapturingGroups()) {}
 
-    // Returns a new Part with the given parameters.
-    static std::unique_ptr<Part> MakePart(Type type, StringPiece param);
+    // A constructor for a VarDef variant.
+    Part(Type type, StringPiece param, StringPiece name, StringPiece expr)
+        : type_(type),
+          param_(param),
+          name_(name),
+          expression_(expr),
+          num_capturing_groups_(CountCapturingGroups()) {}
 
-    // Returns a regular expression to match this part.  If this part is a
-    // fixed string then quoting has been applied.
-    std::string Regex();
+    // Returns a regular expression to match this part, given a mapping of
+    // variable names to values.  If this part is a fixed string or variable use
+    // then quoting has been applied.
+    std::string Regex(const VarMapping& vars) const;
+
+    // Returns number of capturing subgroups in the regex for a Regex or VarDef
+    // part, and 0 for other parts.
+    int NumCapturingGroups() const { return num_capturing_groups_; }
+
+    // If this is a VarDef, then returns the name of the variable. Otherwise
+    // returns an empty string.
+    StringPiece VarDefName() const { return name_; }
+
+    // If this is a VarUse, then returns the name of the variable. Otherwise
+    // returns an empty string.
+    StringPiece VarUseName() const {
+      return type_ == Type::VarUse ? param_ : "";
+    }
 
    private:
+    // Computes the number of capturing groups in this part. This is zero
+    // for Fixed and VarUse parts.
+    int CountCapturingGroups();
+
     // The part type.
     Type type_;
-    // The part parameter.
+    // The part parameter.  For a Regex, VarDef, and VarUse, this does not
+    // have the delimiters.
     StringPiece param_;
+
+    // For a VarDef, the name of the variable.
+    StringPiece name_;
+    // For a VarDef, the regex matching the new value for the variable.
+    StringPiece expression_;
+    // The number of capturing subgroups in the regex for a Regex or VarDef
+    // part, and 0 for other kinds of parts.
+    int num_capturing_groups_;
   };
 
   using Parts = std::vector<std::unique_ptr<Part>>;
 
   // MSVC needs a default constructor.  However, a default-constructed Check
   // instance can't be used for matching.
-  Check() {}
+  Check() : type_(Type::Simple) {}
 
   // Construct a Check object of the given type and fixed parameter string.
   // In particular, this retains a StringPiece reference to the |param|
@@ -108,12 +151,18 @@ class Check {
   // Accessors.
   Type type() const { return type_; }
   StringPiece param() const { return param_; }
+  const Parts& parts() const { return parts_; }
 
-  // Tries to match the given string. If successful, returns true, advances
-  // |str| past the matched portion, and saves the captured substring in captured.
-  // Otherwise returns false and does not update |str| or |captured|.  Assumes
-  // this instance is not default-constructed.
-  bool Matches(StringPiece* str, StringPiece* captured) const;
+  // Tries to match the given string, using |vars| as the variable mapping
+  // context.  A variable use, e.g. '[[X]]', matches the current value for
+  // that variable in vars, 'X' in this case.  A variable definition,
+  // e.g. '[[XYZ:[0-9]+]]', will match against the regex provdided after the
+  // colon.  If successful, returns true, advances |str| past the matched
+  // portion, saves the captured substring in |captured|, and sets the value
+  // of named variables in |vars| with the strings they matched. Otherwise
+  // returns false and does not update |str| or |captured|.  Assumes this
+  // instance is not default-constructed.
+  bool Matches(StringPiece* str, StringPiece* captured, VarMapping* vars) const;
 
   // Returns a string describing this check.
   std::string Description(const Options& options) const;

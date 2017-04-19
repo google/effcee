@@ -33,6 +33,7 @@ using ::testing::ValuesIn;
 using Part = effcee::Check::Part;
 using Status = effcee::Result::Status;
 using Type = Check::Type;
+using VarMapping = effcee::VarMapping;
 
 // Check class
 
@@ -275,13 +276,15 @@ using CheckMatchTest = ::testing::TestWithParam<CheckMatchCase>;
 TEST_P(CheckMatchTest, Samples) {
   StringPiece str = GetParam().input;
   StringPiece captured;
-  const bool matched = GetParam().check.Matches(&str, &captured);
+  VarMapping vars;
+  const bool matched = GetParam().check.Matches(&str, &captured, &vars);
   EXPECT_THAT(matched, Eq(GetParam().expected))
       << "Failed " << GetParam().check.Description(Options()) << " on input "
       << GetParam().input;
   EXPECT_THAT(std::string(str.data(), str.size()), Eq(GetParam().remaining));
   EXPECT_THAT(std::string(captured.data(), captured.size()),
               Eq(GetParam().captured));
+  EXPECT_TRUE(vars.empty());
 }
 
 INSTANTIATE_TEST_CASE_P(
@@ -326,25 +329,27 @@ TEST(CheckDescription, Samples) {
 // Check::Part::Regex
 
 TEST(CheckPart, FixedPartRegex) {
-  EXPECT_THAT(Part(Part::Type::Fixed, "abc").Regex(), Eq("abc"));
-  EXPECT_THAT(Part(Part::Type::Fixed, "a.bc").Regex(), Eq("a\\.bc"));
-  EXPECT_THAT(Part(Part::Type::Fixed, "a?bc").Regex(), Eq("a\\?bc"));
-  EXPECT_THAT(Part(Part::Type::Fixed, "a+bc").Regex(), Eq("a\\+bc"));
-  EXPECT_THAT(Part(Part::Type::Fixed, "a*bc").Regex(), Eq("a\\*bc"));
-  EXPECT_THAT(Part(Part::Type::Fixed, "a[b]").Regex(), Eq("a\\[b\\]"));
-  EXPECT_THAT(Part(Part::Type::Fixed, "a[-]").Regex(), Eq("a\\[\\-\\]"));
-  EXPECT_THAT(Part(Part::Type::Fixed, "a(-)b").Regex(), Eq("a\\(\\-\\)b"));
+  VarMapping vm;
+  EXPECT_THAT(Part(Part::Type::Fixed, "abc").Regex(vm), Eq("abc"));
+  EXPECT_THAT(Part(Part::Type::Fixed, "a.bc").Regex(vm), Eq("a\\.bc"));
+  EXPECT_THAT(Part(Part::Type::Fixed, "a?bc").Regex(vm), Eq("a\\?bc"));
+  EXPECT_THAT(Part(Part::Type::Fixed, "a+bc").Regex(vm), Eq("a\\+bc"));
+  EXPECT_THAT(Part(Part::Type::Fixed, "a*bc").Regex(vm), Eq("a\\*bc"));
+  EXPECT_THAT(Part(Part::Type::Fixed, "a[b]").Regex(vm), Eq("a\\[b\\]"));
+  EXPECT_THAT(Part(Part::Type::Fixed, "a[-]").Regex(vm), Eq("a\\[\\-\\]"));
+  EXPECT_THAT(Part(Part::Type::Fixed, "a(-)b").Regex(vm), Eq("a\\(\\-\\)b"));
 }
 
 TEST(CheckPart, RegexPartRegex) {
-  EXPECT_THAT(Part(Part::Type::Regex, "abc").Regex(), Eq("abc"));
-  EXPECT_THAT(Part(Part::Type::Regex, "a.bc").Regex(), Eq("a.bc"));
-  EXPECT_THAT(Part(Part::Type::Regex, "a?bc").Regex(), Eq("a?bc"));
-  EXPECT_THAT(Part(Part::Type::Regex, "a+bc").Regex(), Eq("a+bc"));
-  EXPECT_THAT(Part(Part::Type::Regex, "a*bc").Regex(), Eq("a*bc"));
-  EXPECT_THAT(Part(Part::Type::Regex, "a[b]").Regex(), Eq("a[b]"));
-  EXPECT_THAT(Part(Part::Type::Regex, "a[-]").Regex(), Eq("a[-]"));
-  EXPECT_THAT(Part(Part::Type::Regex, "a(-)b").Regex(), Eq("a(-)b"));
+  VarMapping vm;
+  EXPECT_THAT(Part(Part::Type::Regex, "abc").Regex(vm), Eq("abc"));
+  EXPECT_THAT(Part(Part::Type::Regex, "a.bc").Regex(vm), Eq("a.bc"));
+  EXPECT_THAT(Part(Part::Type::Regex, "a?bc").Regex(vm), Eq("a?bc"));
+  EXPECT_THAT(Part(Part::Type::Regex, "a+bc").Regex(vm), Eq("a+bc"));
+  EXPECT_THAT(Part(Part::Type::Regex, "a*bc").Regex(vm), Eq("a*bc"));
+  EXPECT_THAT(Part(Part::Type::Regex, "a[b]").Regex(vm), Eq("a[b]"));
+  EXPECT_THAT(Part(Part::Type::Regex, "a[-]").Regex(vm), Eq("a[-]"));
+  EXPECT_THAT(Part(Part::Type::Regex, "a(-)b").Regex(vm), Eq("a(-)b"));
 }
 
 }  // namespace
