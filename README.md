@@ -7,7 +7,9 @@ Effcee:
 - Is a library, so it can be used for quickly running tests in your own process.
 - Is largely compatible with FileCheck, so tests and test-writing skills are
   transferrable.
-- Uses [RE2][RE2] for regular expression matching.
+- Has few dependencies:
+  - The C++11 standard library, and
+  - [RE2][RE2] for regular expression matching.
 
 ## Example
 
