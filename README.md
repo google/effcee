@@ -15,6 +15,8 @@ Effcee:
 
 The following is from [examples/main.cc](examples/main.cc):
 
+```C++
+
     #include <iostream>
     #include <sstream>
 
@@ -65,6 +67,8 @@ The following is from [examples/main.cc](examples/main.cc):
       }
       return 0;
     }
+
+```
 
 For more examples, see the matching tests
 in [effcee/match_test.cc](effcee/match_test.cc).
