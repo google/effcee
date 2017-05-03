@@ -831,4 +831,29 @@ TEST(Match, OutOfOrderDefAndUseViaDAGChecks) {
   EXPECT_FALSE(result) << result.message();
 }
 
+TEST(Match, VarDefRegexCountsParenthesesProperlyPass) {
+  const auto result = Match(
+      "FirstabababSecondcdcd\n1ababab2cdcd",
+      "CHECK: First[[X:(ab)+]]Second[[Y:(cd)+]]\nCHECK: 1[[X]]2[[Y]]");
+  EXPECT_TRUE(result) << result.message();
+}
+
+TEST(Match, VarDefRegexCountsParenthesesProperlyFail) {
+  const auto result = Match(
+      "Firstababab1abab",
+      "CHECK: First[[X:(ab)+]]\nCHECK: 1[[X]]");
+  EXPECT_FALSE(result) << result.message();
+  EXPECT_THAT(result.message(),
+              HasSubstr(R"(<stdin>:2:8: error: expected string not found in input
+CHECK: 1[[X]]
+       ^
+<stdin>:1:12: note: scanning from here
+Firstababab1abab
+           ^
+<stdin>:1:12: note: with variable "X" equal to "ababab"
+Firstababab1abab
+           ^
+)"));
+}
+
 }  // namespace
