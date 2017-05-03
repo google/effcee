@@ -79,13 +79,14 @@ Effcee is a **work in progress**.
 
 What works:
 * All check types: CHECK, CHECK-NEXT, CHECK-SAME, CHECK-DAG, CHECK-LABEL, CHECK-NOT.
-* Fixed strings for check patterns.
+* Check strings can contain:
+  * fixed strings
+  * regular expressions
+  * variable definitions and uses
 * Setting a custom check prefix.
 * Accurate and helpful reporting of match failures.
 
 What is left to do:
-* Support regular expressions in check patterns.
-* Support statefulness: saving and matching against check variables.
 * Add an option to define shorthands for regular expressions.
   * For example, you could express that if the string `%%` appears where a
     regular expression is expected, then it expands to the regular expression
