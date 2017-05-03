@@ -755,7 +755,12 @@ TEST(Match, UndefinedVarNeverMatches) {
   EXPECT_FALSE(result) << result.message();
 }
 
-
-// TODO: DAG def after use
+TEST(Match, OutOfOrderDefAndUseViaDAGChecks) {
+  // In this example the X variable should be set to 'l', and then match
+  // the earlier occurrence in 'Hello'.
+  const auto result =
+      Match("Hello\nWorld", "CHECK-DAG: Wor[[X:[a-z]+]]d\nCHECK-DAG: He[[X]]lo");
+  EXPECT_FALSE(result) << result.message();
+}
 
 }  // namespace
