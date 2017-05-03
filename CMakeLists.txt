@@ -17,4 +17,8 @@ include(cmake/utils.cmake)
 
 add_subdirectory(third_party)
 add_subdirectory(effcee)
-add_subdirectory(examples)
+
+# Building examples requires gmock. Only include it if tests are enabled.
+if(${EFFCEE_ENABLE_TESTS})
+  add_subdirectory(examples)
+endif()

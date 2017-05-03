@@ -1,6 +1,3 @@
-# Suppress all warnings from third-party projects.
-set_property(DIRECTORY APPEND PROPERTY COMPILE_OPTIONS -w)
-
 set(EFFCEE_THIRD_PARTY_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}" CACHE STRING
   "Root location of all third_party projects")
 set(EFFCEE_GOOGLETEST_DIR "${EFFCEE_THIRD_PARTY_ROOT_DIR}/googletest" CACHE STRING

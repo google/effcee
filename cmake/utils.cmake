@@ -42,6 +42,7 @@ function(effcee_default_c_compile_options TARGET)
     # disable warning C4800: 'int' : forcing value to bool 'true' or 'false'
     # (performance warning)
     target_compile_options(${TARGET} PRIVATE /wd4800)
+    target_compile_options(${TARGET} PRIVATE /EHsc)
   endif()
 endfunction(effcee_default_c_compile_options)
 
