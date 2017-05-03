@@ -76,6 +76,11 @@ Check::Check(Type type, StringPiece param) : type_(type), param_(param) {
   parts_.push_back(make_unique<Check::Part>(Part::Type::Fixed, param));
 }
 
+bool Check::Part::MightMatch(const VarMapping& vars) const {
+  return type_ != Type::VarUse ||
+         vars.find(VarUseName().as_string()) != vars.end();
+}
+
 std::string Check::Part::Regex(const VarMapping& vars) const {
   switch (type_) {
     case Type::Fixed:
@@ -90,7 +95,7 @@ std::string Check::Part::Regex(const VarMapping& vars) const {
         // Return the escaped form of the current value of the variable.
         return RE2::QuoteMeta((*where).second);
       } else {
-        // The variable is not yet set.
+        // The variable is not yet set.  Should not get here.
         return "";
       }
     }
@@ -101,6 +106,9 @@ std::string Check::Part::Regex(const VarMapping& vars) const {
 bool Check::Matches(StringPiece* input, StringPiece* captured,
                     VarMapping* vars) const {
   if (parts_.empty()) return false;
+  for (auto& part : parts_) {
+    if (!part->MightMatch(*vars)) return false;
+  }
 
   std::unordered_map<int, std::string> var_def_indices;
 

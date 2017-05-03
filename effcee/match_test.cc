@@ -741,12 +741,21 @@ Begin
 }
 
 
-// TODO: Statefulness: variable definitions and uses
+// Statefulness: variable definitions and uses
 
 TEST(Match, VarDefFollowedByUse) {
   const auto result =
       Match("Hello\nHello", "CHECK: H[[X:[a-z]+]]o\nCHECK-NEXT: H[[X]]o");
   EXPECT_TRUE(result) << result.message();
 }
+
+TEST(Match, UndefinedVarNeverMatches) {
+  const auto result =
+      Match("Hello HeXllo", "CHECK: He[[X]]llo");
+  EXPECT_FALSE(result) << result.message();
+}
+
+
+// TODO: DAG def after use
 
 }  // namespace

@@ -74,6 +74,10 @@ class Check {
           expression_(expr),
           num_capturing_groups_(CountCapturingGroups()) {}
 
+    // Returns true if this part might match a target string.  The only case where
+    // this is false is for a VarUse part where the variable is not yet defined.
+    bool MightMatch(const VarMapping& vars) const;
+
     // Returns a regular expression to match this part, given a mapping of
     // variable names to values.  If this part is a fixed string or variable use
     // then quoting has been applied.
