@@ -743,23 +743,72 @@ Begin
 
 // Statefulness: variable definitions and uses
 
-TEST(Match, VarDefFollowedByUse) {
+TEST(Match, VarDefFollowedByUsePass) {
   const auto result =
       Match("Hello\nHello", "CHECK: H[[X:[a-z]+]]o\nCHECK-NEXT: H[[X]]o");
   EXPECT_TRUE(result) << result.message();
 }
 
-TEST(Match, UndefinedVarNeverMatches) {
+TEST(Match, VarDefFollowedByUseFail) {
   const auto result =
-      Match("Hello HeXllo", "CHECK: He[[X]]llo");
+      Match("Hello\n\nWorld", "CHECK: H[[X:[a-z]+]]o\nCHECK: H[[X]]o");
+  EXPECT_FALSE(result) << result.message();
+  EXPECT_THAT(result.message(),
+              HasSubstr(":2:8: error: expected string not found in input"));
+  EXPECT_THAT(result.message(),
+              HasSubstr("note: with variable \"X\" equal to \"ell\""));
+}
+
+TEST(Match, VarDefFollowedByUseFailAfterDAG) {
+  const auto result =
+      Match("Hello\nWorld",
+            "CHECK: H[[X:[a-z]+]]o\nCHECK-DAG: box[[X]]\nCHECK: H[[X]]o");
+  EXPECT_FALSE(result) << result.message();
+  EXPECT_THAT(result.message(),
+              HasSubstr(":2:12: error: expected string not found in input"));
+  EXPECT_THAT(result.message(),
+              HasSubstr("note: with variable \"X\" equal to \"ell\""));
+}
+
+TEST(Match, VarDefFollowedByUseInNotCheck) {
+  const auto result =
+      Match("Hello\nHello", "CHECK: H[[X:[a-z]+]]o\nCHECK-NOT: H[[X]]o");
+  EXPECT_FALSE(result) << result.message();
+  EXPECT_THAT(result.message(), HasSubstr("CHECK-NOT: string occurred"));
+  EXPECT_THAT(result.message(),
+              HasSubstr("note: with variable \"X\" equal to \"ell\""));
+}
+
+TEST(Match, VarDefFollowedByUseInNextCheckRightLine) {
+  const auto result =
+      Match("Hello\nHello", "CHECK: H[[X:[a-z]+]]o\nCHECK-NEXT: Blad[[X]]");
+  EXPECT_FALSE(result) << result.message();
+  EXPECT_THAT(result.message(),
+              HasSubstr(":2:13: error: expected string not found in input"));
+  EXPECT_THAT(result.message(),
+              HasSubstr("note: with variable \"X\" equal to \"ell\""));
+}
+
+TEST(Match, VarDefFollowedByUseInNextCheckBadLine) {
+  const auto result =
+      Match("Hello\n\nHello", "CHECK: H[[X:[a-z]+]]o\nCHECK-NEXT: H[[X]]o");
+  EXPECT_FALSE(result) << result.message();
+  EXPECT_THAT(result.message(),
+              HasSubstr(":2:13: error: CHECK-NEXT: is not on the line after"));
+  EXPECT_THAT(result.message(),
+              HasSubstr("note: with variable \"X\" equal to \"ell\""));
+}
+
+TEST(Match, UndefinedVarNeverMatches) {
+  const auto result = Match("Hello HeXllo", "CHECK: He[[X]]llo");
   EXPECT_FALSE(result) << result.message();
 }
 
 TEST(Match, OutOfOrderDefAndUseViaDAGChecks) {
   // In this example the X variable should be set to 'l', and then match
   // the earlier occurrence in 'Hello'.
-  const auto result =
-      Match("Hello\nWorld", "CHECK-DAG: Wor[[X:[a-z]+]]d\nCHECK-DAG: He[[X]]lo");
+  const auto result = Match(
+      "Hello\nWorld", "CHECK-DAG: Wor[[X:[a-z]+]]d\nCHECK-DAG: He[[X]]lo");
   EXPECT_FALSE(result) << result.message();
 }
 
