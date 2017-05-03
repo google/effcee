@@ -802,6 +802,25 @@ TEST(Match, VarDefFollowedByUseInNextCheckBadLine) {
 TEST(Match, UndefinedVarNeverMatches) {
   const auto result = Match("Hello HeXllo", "CHECK: He[[X]]llo");
   EXPECT_FALSE(result) << result.message();
+  EXPECT_THAT(result.message(),
+              HasSubstr("note: uses undefined variable \"X\""));
+}
+
+TEST(Match, NoteSeveralUndefinedVariables) {
+  const auto result = Match("Hello HeXllo", "CHECK: He[[X]]l[[YZ]]lo[[Q]]");
+  EXPECT_FALSE(result) << result.message();
+  EXPECT_THAT(result.message(),
+              HasSubstr(R"(
+<stdin>:1:1: note: uses undefined variable "X"
+Hello HeXllo
+^
+<stdin>:1:1: note: uses undefined variable "YZ"
+Hello HeXllo
+^
+<stdin>:1:1: note: uses undefined variable "Q"
+Hello HeXllo
+^
+)"));
 }
 
 TEST(Match, OutOfOrderDefAndUseViaDAGChecks) {

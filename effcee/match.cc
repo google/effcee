@@ -95,8 +95,12 @@ Result Match(StringPiece input, StringPiece checks, const Options& options) {
       const auto var_use = part->VarUseName();
       if (!var_use.empty()) {
         std::ostringstream phrase;
-        phrase << "note: with variable \"" << var_use << "\" equal to \""
-               << vars[var_use.as_string()] << "\"";
+        if (vars.find(var_use.as_string()) != vars.end()) {
+          phrase << "note: with variable \"" << var_use << "\" equal to \""
+                 << vars[var_use.as_string()] << "\"";
+        } else {
+          phrase << "note: uses undefined variable \"" << var_use << "\"";
+        }
         out << input_msg(where, phrase.str());
       }
     }
