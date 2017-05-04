@@ -16,6 +16,15 @@ if(${EFFCEE_ENABLE_TESTS})
 endif()
 
 if (IS_DIRECTORY ${EFFCEE_RE2_DIR})
+
+  if ("${MSVC}")
+  # Disable RE2's Level 4 MSVC warnings:
+  # 4201: nameless struct/union
+  # 4815: zero-sized array in stack
+  # EHs:  Exception handling
+  add_compile_options(/wd4201 /wd4815 /EHs)
+  endif()
+
   add_subdirectory(${EFFCEE_RE2_DIR} re2)
 endif()
 if (NOT TARGET re2)
