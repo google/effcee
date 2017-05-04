@@ -3,6 +3,8 @@ project(effcee C CXX)
 enable_testing()
 
 option(EFFCEE_SKIP_TESTS "Skip building tests" ${EFFCEE_SKIP_TESTS})
+option(EFFCEE_ENABLE_SAMPLES "Enable building samples" ${EFFCEE_ENABLE_SAMPLES})
+
 if(NOT ${EFFCEE_SKIP_TESTS})
   set(EFFCEE_ENABLE_TESTS ON)
 endif()
@@ -18,7 +20,6 @@ include(cmake/utils.cmake)
 add_subdirectory(third_party)
 add_subdirectory(effcee)
 
-# Building examples requires gmock. Only include it if tests are enabled.
-if(${EFFCEE_ENABLE_TESTS})
+if(${EFFCEE_ENABLE_SAMPLES})
   add_subdirectory(examples)
 endif()
