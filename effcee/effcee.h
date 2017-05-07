@@ -20,8 +20,7 @@
 
 namespace effcee {
 
-// TODO(dneto): Describe example usage.
-// TODO(dneto): Support statefulness: capturing variables
+// TODO(dneto): Provide a check language tutorial / manual.
 
 // This does not implement the equivalents of FileCheck options:
 //   --match-full-lines
