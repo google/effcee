@@ -17,16 +17,18 @@ install(TARGETS effcee
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib)
 
-add_executable(effcee-test
-               check_test.cc
-               cursor_test.cc
-               diagnostic_test.cc
-               match_test.cc
-               options_test.cc
-               result_test.cc)
-effcee_default_compile_options(effcee-test)
-target_include_directories(effcee-test PRIVATE
-                           ${gmock_SOURCE_DIR}/include
-                           ${gtest_SOURCE_DIR}/include)
-target_link_libraries(effcee-test PRIVATE effcee gmock gtest_main)
-add_test(NAME effcee-test COMMAND effcee-test)
+if(EFFCEE_BUILD_TESTING)
+  add_executable(effcee-test
+                 check_test.cc
+                 cursor_test.cc
+                 diagnostic_test.cc
+                 match_test.cc
+                 options_test.cc
+                 result_test.cc)
+  effcee_default_compile_options(effcee-test)
+  target_include_directories(effcee-test PRIVATE
+                             ${gmock_SOURCE_DIR}/include
+                             ${gtest_SOURCE_DIR}/include)
+  target_link_libraries(effcee-test PRIVATE effcee gmock gtest_main)
+  add_test(NAME effcee-test COMMAND effcee-test)
+endif(EFFCEE_BUILD_TESTING)

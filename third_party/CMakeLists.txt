@@ -9,7 +9,7 @@ set(EFFCEE_RE2_DIR "${EFFCEE_THIRD_PARTY_ROOT_DIR}/re2" CACHE STRING
   "Location of re2 source")
 
 # Configure third party projects.
-if(${EFFCEE_ENABLE_TESTS})
+if(EFFCEE_BUILD_TESTING)
   if (IS_DIRECTORY ${EFFCEE_GOOGLETEST_DIR})
     add_subdirectory(${EFFCEE_GOOGLETEST_DIR} googletest)
   endif()

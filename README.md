@@ -186,13 +186,20 @@ cmake configure line.
 
 ### Tests
 
-Effcee registers two tests with `ctest`:
+By default, Effcee registers two tests with `ctest`:
 
 * `effcee-test`: All library tests, based on Googletest.
 * `effcee-example`: Executes the example executable with sample inputs.
 
 Running `ctest` without arguments will run the tests for Effcee as well as for
 RE2.
+
+You can disable Effcee's tests by using `-DEFFCEE_BUILD_TESTING=OFF` at
+configuration time:
+
+```sh
+cmake -GNinja -DEFFCEE_BUILD_TESTING=OFF ...
+```
 
 The RE2 tests run much longer, so if you're working on Effcee alone, we
 suggest limiting ctest to tests with prefix `effcee`:
@@ -230,6 +237,7 @@ On Windows, the following tools should be installed and available on your path:
 - `DISABLE_RTTI`. Disable runtime type information. Default is enabled.
 - `DISABLE_EXCEPTIONS`.  Disable exceptions. Default is enabled.
 - `EFFCEE_ENABLE_SHARED_CRT`. See above.
+- `EFFCEE_BUILD_TESTING`. Should Effcee tests be built?  Defaults to `ON`.
 - `RE2_BUILD_TESTING`. Should RE2 tests be built?  Defaults to `ON`.
 
 ## Bug tracking
