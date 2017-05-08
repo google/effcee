@@ -166,8 +166,10 @@ Check::Parts PartsForPattern(StringPiece pattern) {
     if (regex_exists && (!var_exists || regex_start < var_start)) {
       const auto consumed =
           RE2::Consume(&pattern, "(.*?){{(.*?)}}", &fixed, &regex);
-      assert(consumed &&
-             "Did not make forward progress for regex in check rule");
+      if (!consumed) {
+        assert(consumed &&
+               "Did not make forward progress for regex in check rule");
+      }
       if (!fixed.empty()) {
         parts.emplace_back(make_unique<Check::Part>(Type::Fixed, fixed));
       }
@@ -177,7 +179,10 @@ Check::Parts PartsForPattern(StringPiece pattern) {
     } else if (var_exists && (!regex_exists || var_start < regex_start)) {
       const auto consumed =
           RE2::Consume(&pattern, "(.*?)\\[\\[(.*?)\\]\\]", &fixed, &var);
-      assert(consumed && "Did not make forward progress for var in check rule");
+      if (!consumed) {
+        assert(consumed &&
+               "Did not make forward progress for var in check rule");
+      }
       if (!fixed.empty()) {
         parts.emplace_back(make_unique<Check::Part>(Type::Fixed, fixed));
       }
