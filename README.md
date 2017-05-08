@@ -1,5 +1,7 @@
 # Effcee
 
+[![Linux and OSX Build Status](https://travis-ci.org/google/effcee.svg)](https://travis-ci.org/google/effcee "Linux and OSX Build Status")
+
 Effcee is a C++ library for stateful pattern matching of strings,
 inspired by LLVM's [FileCheck][FileCheck] command.
 
