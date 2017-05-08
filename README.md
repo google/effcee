@@ -140,8 +140,11 @@ git clone https://github.com/google/re2.git
 cd $SOURCE_DIR/
 ```
 
-Note: You can set CMake variables to point to third party sources if they
-are located somewhere else.  See the [Build options](#build-options) below.
+Note: There are two other ways to manage third party sources:
+- If you are building Effcee as part of a larger CMake-based project,
+  add the RE2 and `googletest` projects before adding Effcee.
+- Otherwise, you can set CMake variables to point to third party sources
+  if they are located somewhere else.  See the [Build options](#build-options) below.
 
 2) Ensure you have the requisite tools -- see the tools subsection below.
 
