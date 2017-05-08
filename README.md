@@ -8,7 +8,7 @@ inspired by LLVM's [FileCheck][FileCheck] command.
 Effcee:
 - Is a library, so it can be used for quickly running tests in your own process.
 - Is largely compatible with FileCheck, so tests and test-writing skills are
-  transferrable.
+  transferable.
 - Has few dependencies:
   - The C++11 standard library, and
   - [RE2][RE2] for regular expression matching.
@@ -232,7 +232,7 @@ installed regardless of your OS:
 
 On Linux, if cross compiling to Windows:
 - [MinGW][MinGW]: A GCC-based cross compiler targeting Windows
-    so that generated executables use the Micrsoft C runtime libraries.
+    so that generated executables use the Microsoft C runtime libraries.
 
 On Windows, the following tools should be installed and available on your path:
 
