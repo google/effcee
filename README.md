@@ -247,7 +247,7 @@ Third party source locations:
   `third_party`.
 - `EFFCEE_RE2_DIR`: Location of `re2` sources, if not under `third_party`.
 - `EFFCEE_THIRD_PARTY_ROOT_DIR`: Alternate location for `googletest` and
-  `re2` subdirectories.  This is used the sources are not located under
+  `re2` subdirectories.  This is used if the sources are not located under
   the `third_party` directory, and if the previous two variables are not set.
 
 Compilation options:
@@ -255,7 +255,8 @@ Compilation options:
 - `DISABLE_EXCEPTIONS`.  Disable exceptions. Default is enabled.
 - `EFFCEE_ENABLE_SHARED_CRT`. See above.
 
-Controlling tests:
+Controlling samples and tests:
+- `EFFCEE_BUILD_SAMPLES`. Should Effcee examples be built?  Defaults to `ON`.
 - `EFFCEE_BUILD_TESTING`. Should Effcee tests be built?  Defaults to `ON`.
 - `RE2_BUILD_TESTING`. Should RE2 tests be built?  Defaults to `ON`.
 
