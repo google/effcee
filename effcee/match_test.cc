@@ -809,8 +809,7 @@ TEST(Match, UndefinedVarNeverMatches) {
 TEST(Match, NoteSeveralUndefinedVariables) {
   const auto result = Match("Hello HeXllo", "CHECK: He[[X]]l[[YZ]]lo[[Q]]");
   EXPECT_FALSE(result) << result.message();
-  EXPECT_THAT(result.message(),
-              HasSubstr(R"(
+  const char* substr = R"(
 <stdin>:1:1: note: uses undefined variable "X"
 Hello HeXllo
 ^
@@ -820,7 +819,8 @@ Hello HeXllo
 <stdin>:1:1: note: uses undefined variable "Q"
 Hello HeXllo
 ^
-)"));
+)";
+  EXPECT_THAT(result.message(), HasSubstr(substr));
 }
 
 TEST(Match, OutOfOrderDefAndUseViaDAGChecks) {
@@ -839,12 +839,10 @@ TEST(Match, VarDefRegexCountsParenthesesProperlyPass) {
 }
 
 TEST(Match, VarDefRegexCountsParenthesesProperlyFail) {
-  const auto result = Match(
-      "Firstababab1abab",
-      "CHECK: First[[X:(ab)+]]\nCHECK: 1[[X]]");
+  const auto result =
+      Match("Firstababab1abab", "CHECK: First[[X:(ab)+]]\nCHECK: 1[[X]]");
   EXPECT_FALSE(result) << result.message();
-  EXPECT_THAT(result.message(),
-              HasSubstr(R"(<stdin>:2:8: error: expected string not found in input
+  const char* substr = R"(<stdin>:2:8: error: expected string not found in input
 CHECK: 1[[X]]
        ^
 <stdin>:1:12: note: scanning from here
@@ -853,7 +851,8 @@ Firstababab1abab
 <stdin>:1:12: note: with variable "X" equal to "ababab"
 Firstababab1abab
            ^
-)"));
+)";
+  EXPECT_THAT(result.message(), HasSubstr(substr));
 }
 
 }  // namespace
