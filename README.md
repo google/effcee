@@ -140,6 +140,9 @@ git clone https://github.com/google/re2.git
 cd $SOURCE_DIR/
 ```
 
+Note: You can set CMake variables to point to third party sources if they
+are located somewhere else.  See the [Build options](#build-options) below.
+
 2) Ensure you have the requisite tools -- see the tools subsection below.
 
 3) Decide where to place the build output. In the following steps, we'll call it
@@ -234,9 +237,20 @@ On Windows, the following tools should be installed and available on your path:
 
 ### Build options
 
+Third party source locations:
+- `EFFCEE_GOOGLETEST_DIR`: Location of `googletest` sources, if not under
+  `third_party`.
+- `EFFCEE_RE2_DIR`: Location of `re2` sources, if not under `third_party`.
+- `EFFCEE_THIRD_PARTY_ROOT_DIR`: Alternate location for `googletest` and
+  `re2` subdirectories.  This is used the sources are not located under
+  the `third_party` directory, and if the previous two variables are not set.
+
+Compilation options:
 - `DISABLE_RTTI`. Disable runtime type information. Default is enabled.
 - `DISABLE_EXCEPTIONS`.  Disable exceptions. Default is enabled.
 - `EFFCEE_ENABLE_SHARED_CRT`. See above.
+
+Controlling tests:
 - `EFFCEE_BUILD_TESTING`. Should Effcee tests be built?  Defaults to `ON`.
 - `RE2_BUILD_TESTING`. Should RE2 tests be built?  Defaults to `ON`.
 
