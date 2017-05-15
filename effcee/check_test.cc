@@ -279,8 +279,7 @@ TEST_P(CheckMatchTest, Samples) {
   VarMapping vars;
   const bool matched = GetParam().check.Matches(&str, &captured, &vars);
   EXPECT_THAT(matched, Eq(GetParam().expected))
-      << "Failed " << GetParam().check.Description(Options()) << " on input "
-      << GetParam().input;
+      << "Failed on input " << GetParam().input;
   EXPECT_THAT(std::string(str.data(), str.size()), Eq(GetParam().remaining));
   EXPECT_THAT(std::string(captured.data(), captured.size()),
               Eq(GetParam().captured));
@@ -313,18 +312,6 @@ INSTANTIATE_TEST_CASE_P(
         {"in hello now", Check(Type::Not, "hello"), true, " now", "hello"},
     }), );
 
-// Check::Description
-TEST(CheckDescription, Samples) {
-  EXPECT_THAT(Check(Type::Simple, "hello").Description(Options()),
-              Eq("CHECK: hello"));
-  EXPECT_THAT(
-      Check(Type::Simple, "magic").Description(Options().SetPrefix("Zing")),
-      Eq("Zing: magic"));
-  EXPECT_THAT(Check(Type::DAG, "now").Description(Options()),
-              Eq("CHECK-DAG: now"));
-  EXPECT_THAT(Check(Type::Next, "it").Description(Options().SetPrefix("Boo")),
-              Eq("Boo-NEXT: it"));
-}
 
 // Check::Part::Regex
 

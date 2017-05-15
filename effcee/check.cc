@@ -51,17 +51,6 @@ Type TypeForSuffix(StringPiece suffix) {
   assert(pair_iter != type_str_table.end());
   return pair_iter->second;
 }
-
-StringPiece SuffixForType(Type type) {
-  const auto& type_str_table = TypeStringTable();
-  const auto pair_iter =
-      std::find_if(type_str_table.begin(), type_str_table.end(),
-                   [type](const std::pair<StringPiece, Type>& elem) {
-                     return type == elem.second;
-                   });
-  assert(pair_iter != type_str_table.end());
-  return pair_iter->first;
-}
 }  // namespace
 
 namespace effcee {
@@ -137,12 +126,6 @@ bool Check::Matches(StringPiece* input, StringPiece* captured,
   }
 
   return matched;
-}
-
-std::string Check::Description(const Options& options) const {
-  std::ostringstream out;
-  out << options.prefix() << SuffixForType(type()) << ": " << param();
-  return out.str();
 }
 
 namespace {

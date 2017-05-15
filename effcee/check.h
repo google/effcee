@@ -168,9 +168,6 @@ class Check {
   // instance is not default-constructed.
   bool Matches(StringPiece* str, StringPiece* captured, VarMapping* vars) const;
 
-  // Returns a string describing this check.
-  std::string Description(const Options& options) const;
-
  private:
   // The type of check.
   Type type_;
