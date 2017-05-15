@@ -9,7 +9,7 @@ if(EFFCEE_BUILD_TESTING)
   add_test(NAME effcee-example
           COMMAND ${PYTHON_EXE}
                   effcee-example-driver.py
-                  ${CMAKE_CURRENT_BINARY_DIR}/effcee-example
+                  $<TARGET_FILE:effcee-example>
                   example_data.txt
                   "CHECK: Hello"
                   "CHECK-SAME: world"
