@@ -24,6 +24,11 @@ endif()
 
 # Configure third party projects.
 if(EFFCEE_BUILD_TESTING)
+  # Our tests use ::testing::Combine.  Force the ability to use it, working
+  # around googletest's possibly faulty compiler detection logic.
+  # See https://github.com/google/googletest/issues/1352
+  add_definitions(-DGTEST_HAS_COMBINE=1)
+
   if (NOT TARGET gmock)
     if (IS_DIRECTORY ${EFFCEE_GOOGLETEST_DIR})
       add_subdirectory(${EFFCEE_GOOGLETEST_DIR} googletest)
