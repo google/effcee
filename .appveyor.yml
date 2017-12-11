@@ -4,6 +4,14 @@
 # version format
 version: "{build}"
 
+os:
+  - Visual Studio 2013
+  - Visual Studio 2015
+  - Visual Studio 2017
+
+platform:
+  - x64
+
 configuration:
   - Debug
   - Release
@@ -12,10 +20,23 @@ branches:
   only:
     - master
 
+matrix:
+  fast_finish: true
+  exclude:
+    - os: Visual Studio 2013
+      configuration: Debug
+    - os: Visual Studio 2015
+      configuration: Debug
+
 # scripts that run after cloning repository
 install:
   - git clone --depth=1 https://github.com/google/googletest.git      third_party/googletest
   - git clone --depth=1 https://github.com/google/re2.git             third_party/re2
+
+before_build:
+  - if "%APPVEYOR_BUILD_WORKER_IMAGE%"=="Visual Studio 2013" (call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" x86_amd64)
+  - if "%APPVEYOR_BUILD_WORKER_IMAGE%"=="Visual Studio 2015" (call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86_amd64)
+  - if "%APPVEYOR_BUILD_WORKER_IMAGE%"=="Visual Studio 2017" (call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat" x86_amd64)
 
 build:
   parallel: true  # enable MSBuild parallel builds
