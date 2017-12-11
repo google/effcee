@@ -5,6 +5,12 @@ enable_testing()
 option(EFFCEE_BUILD_TESTING "Enable testing for Effcee" ON)
 if(${EFFCEE_BUILD_TESTING})
   message(STATUS "Configuring Effcee to build tests.")
+  if(MSVC)
+    # Our tests use ::testing::Combine.  Force the ability to use it, working
+    # around googletest's possibly faulty compiler detection logic.
+    # See https://github.com/google/googletest/issues/1352
+    add_definitions(-DGTEST_HAS_COMBINE=1)
+  endif(MSVC)
 else()
   message(STATUS "Configuring Effcee to avoid building tests.")
 endif()
