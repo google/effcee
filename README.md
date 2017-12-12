@@ -236,8 +236,8 @@ On Linux, if cross compiling to Windows:
 
 On Windows, the following tools should be installed and available on your path:
 
-- Visual Studio 2013 Update 4 or later. Previous versions of Visual Studio
-  will likely work but are untested.
+- Visual Studio 2015 or later. Previous versions of Visual Studio are not usable
+  with RE2.
 - Git - including the associated tools, Bash, `diff`.
 
 ### Build options
