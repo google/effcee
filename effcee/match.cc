@@ -107,6 +107,8 @@ Result Match(StringPiece input, StringPiece checks, const Options& options) {
     return out.str();
   };
 
+  Cursor negative_cursor(cursor);
+
   // For each line.
   for (; !cursor.Exhausted(); cursor.AdvanceLine()) {
     // Try to match the current line against the unresolved checks.
@@ -215,7 +217,7 @@ Result Match(StringPiece input, StringPiece checks, const Options& options) {
           for (auto j = first_unresolved_negative,
                     limit = std::min(first_unresolved_dag, i);
                j < limit; ++j) {
-            resolved[i] = true;
+            resolved[j] = true;
           }
 
           // Normally advance past the matched text.  But DAG checks might need
