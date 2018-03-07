@@ -183,6 +183,42 @@ TEST(Match, BetweenNotLinesNeverSeenPasses) {
   EXPECT_TRUE(result);
 }
 
+TEST(Match, NotBetweenMatchesPasses) {
+  const auto result =
+      Match("Hello\nWorld\nBorg\n", "CHECK: Hello\nCHECK-NOT: Borg\nCHECK: World");
+  EXPECT_TRUE(result);
+}
+
+TEST(Match, NotBeforeFirstMatchPasses) {
+  const auto result =
+      Match("Hello\nWorld\nBorg\n", "CHECK-NOT: World\nCHECK: Hello");
+  EXPECT_TRUE(result);
+}
+
+TEST(Match, NotAfterLastMatchPasses) {
+  const auto result =
+      Match("Hello\nWorld\nBorg\n", "CHECK: World\nCHECK-NOT: Hello");
+  EXPECT_TRUE(result);
+}
+
+TEST(Match, NotBeforeFirstMatchFails) {
+  const auto result =
+      Match("Hello\nWorld\n", "CHECK-NOT: Hello\nCHECK: World");
+  EXPECT_FALSE(result);
+}
+
+TEST(Match, NotBetweenMatchesFails) {
+  const auto result =
+      Match("Hello\nWorld\nBorg\n", "CHECK: Hello\nCHECK-NOT: World\nCHECK: Borg");
+  EXPECT_FALSE(result);
+}
+
+TEST(Match, NotAfterLastMatchFails) {
+  const auto result =
+      Match("Hello\nWorld\n", "CHECK: Hello\nCHECK-NOT: World");
+  EXPECT_FALSE(result);
+}
+
 TEST(Match, TrailingNotNeverSeenPasses) {
   const auto result = Match("Hello", "CHECK: Hello\nCHECK-NOT: Borg");
   EXPECT_TRUE(result);
