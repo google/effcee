@@ -107,8 +107,6 @@ Result Match(StringPiece input, StringPiece checks, const Options& options) {
     return out.str();
   };
 
-  Cursor negative_cursor(cursor);
-
   // For each line.
   for (; !cursor.Exhausted(); cursor.AdvanceLine()) {
     // Try to match the current line against the unresolved checks.
