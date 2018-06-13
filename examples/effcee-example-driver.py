@@ -33,7 +33,7 @@ def main():
     checks = sys.argv[3:]
     args = [cmd]
     args.extend(checks)
-    print args
+    print(args)
     with open(input_file) as input_stream:
         sys.exit(subprocess.call(args, stdin=input_stream))
     sys.exit(1)
