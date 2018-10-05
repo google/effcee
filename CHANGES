@@ -1,4 +1,7 @@
 Revision history for Effcee
 
+v2018.1-dev 2018-10-05
+ - Start v2018.1 developmen
+
 v2018.0 2018-10-05
  - Mature enough for production use by third party projects such as DXC and SPIRV-Tools.
