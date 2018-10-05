@@ -77,7 +77,8 @@ in [effcee/match_test.cc](effcee/match_test.cc).
 
 ## Status
 
-Effcee is a **work in progress**.
+Effcee is mature enough to be relied upon by
+[third party projects](#what-uses-effcee), but could be improved.
 
 What works:
 * All check types: CHECK, CHECK-NEXT, CHECK-SAME, CHECK-DAG, CHECK-LABEL, CHECK-NOT.
@@ -237,7 +238,7 @@ On Linux, if cross compiling to Windows:
 On Windows, the following tools should be installed and available on your path:
 
 - Visual Studio 2015 or later. Previous versions of Visual Studio are not usable
-  with RE2.
+  with RE2 or Googletest.
 - Git - including the associated tools, Bash, `diff`.
 
 ### Build options
@@ -265,11 +266,19 @@ Controlling samples and tests:
 We track bugs using GitHub -- click on the "Issues" button on
 [the project's GitHub page](https://github.com/google/effcee).
 
+## What uses Effcee?
+
+- [Tests](https://github.com/Microsoft/DirectXShaderCompiler/tree/master/tools/clang/test/CodeGenSPIRV)
+  for SPIR-V code generation in the [DXC][DXC] HLSL compiler.
+- Tests for [SPIRV-Tools][SPIRV-Tools]
+
 ## References
 
-[FileCheck]: http://llvm.org/docs/CommandGuide/FileCheck.html
-[RE2]: https://github.com/google/re2
-[Googletest]: https://github.com/google/googletest
 [CMake]: https://cmake.org/
-[Python]: https://www.python.org/
+[DXC]: https://github.com/Microsoft/DirectXShaderCompiler
+[FileCheck]: http://llvm.org/docs/CommandGuide/FileCheck.html
+[Googletest]: https://github.com/google/googletest
 [MinGW]: http://www.mingw.org/
+[Python]: https://www.python.org/
+[RE2]: https://github.com/google/re2
+[SPIRV-Tools]: https://github.com/KhronosGroup/SPIRV-Tools
