@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 2.8.12)
 project(effcee C CXX)
 enable_testing()
 
+set (CMAKE_CXX_STANDARD 11)
+
 option(EFFCEE_BUILD_TESTING "Enable testing for Effcee" ON)
 if(${EFFCEE_BUILD_TESTING})
   message(STATUS "Configuring Effcee to build tests.")
