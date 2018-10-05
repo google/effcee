@@ -35,7 +35,7 @@ branches:
 addons:
   apt:
     packages:
-      - clang-3.6
+      - clang
       - ninja-build
 
 before_install:
@@ -44,7 +44,7 @@ before_install:
 
 install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" && "$CC" == "clang" ]]; then
-      export CC=clang-3.6 CXX=clang++-3.6;
+      export CC=clang CXX=clang++;
     fi
 
 before_script:
