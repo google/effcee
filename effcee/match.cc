@@ -12,17 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <cassert>
 #include <algorithm>
-#include <string>
+#include <cassert>
 #include <sstream>
+#include <string>
 #include <vector>
 
 #include "check.h"
 #include "cursor.h"
 #include "diagnostic.h"
 #include "effcee.h"
-
+#include "to_string.h"
 
 using effcee::Check;
 using Status = effcee::Result::Status;
@@ -95,9 +95,10 @@ Result Match(StringPiece input, StringPiece checks, const Options& options) {
       const auto var_use = part->VarUseName();
       if (!var_use.empty()) {
         std::ostringstream phrase;
-        if (vars.find(var_use.as_string()) != vars.end()) {
+        std::string var_use_str(ToString(var_use));
+        if (vars.find(var_use_str) != vars.end()) {
           phrase << "note: with variable \"" << var_use << "\" equal to \""
-                 << vars[var_use.as_string()] << "\"";
+                 << vars[var_use_str] << "\"";
         } else {
           phrase << "note: uses undefined variable \"" << var_use << "\"";
         }
@@ -111,8 +112,8 @@ Result Match(StringPiece input, StringPiece checks, const Options& options) {
   for (; !cursor.Exhausted(); cursor.AdvanceLine()) {
     // Try to match the current line against the unresolved checks.
 
-    // The number of characters the cursor should advance to accommodate a recent
-    // DAG check match.
+    // The number of characters the cursor should advance to accommodate a
+    // recent DAG check match.
     size_t deferred_advance = 0;
 
     bool scan_this_line = true;
@@ -196,14 +197,12 @@ Result Match(StringPiece input, StringPiece checks, const Options& options) {
           }
 
           if (check.type() != Type::DAG && first_unresolved_dag < i) {
-            return fail() << check_msg(
-                                 pattern[first_unresolved_dag].param(),
-                                 "error: expected string not found in input")
-                          << input_msg(previous_match_end,
-                                       "note: scanning from here")
-                          << input_msg(captured,
-                                       "note: next check matches here")
-                          << var_notes(previous_match_end, check);
+            return fail()
+                   << check_msg(pattern[first_unresolved_dag].param(),
+                                "error: expected string not found in input")
+                   << input_msg(previous_match_end, "note: scanning from here")
+                   << input_msg(captured, "note: next check matches here")
+                   << var_notes(previous_match_end, check);
           }
 
           resolved[i] = true;

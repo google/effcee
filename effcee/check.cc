@@ -14,8 +14,8 @@
 
 #include "check.h"
 
-#include <cassert>
 #include <algorithm>
+#include <cassert>
 #include <memory>
 #include <sstream>
 #include <string>
@@ -24,6 +24,7 @@
 #include "cursor.h"
 #include "effcee.h"
 #include "make_unique.h"
+#include "to_string.h"
 
 using Status = effcee::Result::Status;
 using StringPiece = effcee::StringPiece;
@@ -67,7 +68,7 @@ Check::Check(Type type, StringPiece param) : type_(type), param_(param) {
 
 bool Check::Part::MightMatch(const VarMapping& vars) const {
   return type_ != Type::VarUse ||
-         vars.find(VarUseName().as_string()) != vars.end();
+         vars.find(ToString(VarUseName())) != vars.end();
 }
 
 std::string Check::Part::Regex(const VarMapping& vars) const {
@@ -75,11 +76,11 @@ std::string Check::Part::Regex(const VarMapping& vars) const {
     case Type::Fixed:
       return RE2::QuoteMeta(param_);
     case Type::Regex:
-      return param_.as_string();
+      return ToString(param_);
     case Type::VarDef:
-      return std::string("(") + expression_.as_string() + ")";
+      return std::string("(") + ToString(expression_) + ")";
     case Type::VarUse: {
-      auto where = vars.find(VarUseName().as_string());
+      auto where = vars.find(ToString(VarUseName()));
       if (where != vars.end()) {
         // Return the escaped form of the current value of the variable.
         return RE2::QuoteMeta((*where).second);
@@ -89,7 +90,7 @@ std::string Check::Part::Regex(const VarMapping& vars) const {
       }
     }
   }
-  return ""; // Unreachable.  But we need to satisfy GCC.
+  return "";  // Unreachable.  But we need to satisfy GCC.
 }
 
 bool Check::Matches(StringPiece* input, StringPiece* captured,
@@ -107,7 +108,7 @@ bool Check::Matches(StringPiece* input, StringPiece* captured,
     consume_regex << part->Regex(*vars);
     const auto var_def_name = part->VarDefName();
     if (!var_def_name.empty()) {
-      var_def_indices[num_captures++] = var_def_name.as_string();
+      var_def_indices[num_captures++] = ToString(var_def_name);
     }
     num_captures += part->NumCapturingGroups();
   }
@@ -121,7 +122,7 @@ bool Check::Matches(StringPiece* input, StringPiece* captured,
     // Update the variable mapping.
     for (auto& var_def_index : var_def_indices) {
       const int index = var_def_index.first;
-      (*vars)[var_def_index.second] = captures[index].as_string();
+      (*vars)[var_def_index.second] = ToString(captures[index]);
     }
   }
 
@@ -129,8 +130,9 @@ bool Check::Matches(StringPiece* input, StringPiece* captured,
 }
 
 namespace {
-// Returns a parts list for the given pattern.  This splits out regular expressions as
-// delimited by {{ and }}, and also variable uses and definitions.
+// Returns a parts list for the given pattern.  This splits out regular
+// expressions as delimited by {{ and }}, and also variable uses and
+// definitions.
 Check::Parts PartsForPattern(StringPiece pattern) {
   Check::Parts parts;
   StringPiece fixed, regex, var;
@@ -192,7 +194,7 @@ Check::Parts PartsForPattern(StringPiece pattern) {
   return parts;
 }
 
-}  // anonymous
+}  // namespace
 
 std::pair<Result, CheckList> ParseChecks(StringPiece str,
                                          const Options& options) {
