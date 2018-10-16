@@ -1,7 +1,8 @@
 Revision history for Effcee
 
 v2018.2-dev 2018-10-05
- - Start v2018.2 development
+ - Fixes:
+   #23: Avoid StringPiece::as_string to enhance portability.
 
 v2018.1 2018-10-05
  - Require CMake 3.1 or later
