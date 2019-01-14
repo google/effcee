@@ -25,6 +25,10 @@ else()
   message(STATUS "Configuring Effcee to avoid building samples.")
 endif()
 
+# RE2 needs Pthreads on non-WIN32
+set(CMAKE_THREAD_LIBS_INIT "")
+find_package(Threads)
+
 include(cmake/setup_build.cmake)
 include(cmake/utils.cmake)
 

@@ -1,9 +1,15 @@
 add_executable(effcee-example main.cc)
 
 target_link_libraries(effcee-example effcee)
-if(UNIX)
-  target_link_libraries(effcee-example -pthread)
-endif(UNIX)
+if(UNIX AND NOT MINGW)
+  set_target_properties(effcee-example PROPERTIES LINK_FLAGS -pthread)
+endif()
+if (WIN32 AND NOT MSVC)
+  # For MinGW cross-compile, statically link to the C++ runtime
+  set_target_properties(effcee-example PROPERTIES
+	  LINK_FLAGS "-static -static-libgcc -static-libstdc++")
+endif(WIN32 AND NOT MSVC)
+
 
 if(EFFCEE_BUILD_TESTING)
   add_test(NAME effcee-example

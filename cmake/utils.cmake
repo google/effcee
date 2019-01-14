@@ -17,9 +17,6 @@
 function(effcee_default_c_compile_options TARGET)
   if (NOT "${MSVC}")
     target_compile_options(${TARGET} PRIVATE -Wall -Werror)
-    if (UNIX)
-      target_compile_options(${TARGET} PUBLIC -pthread)
-    endif(UNIX)
     if (ENABLE_CODE_COVERAGE)
       # The --coverage option is a synonym for -fprofile-arcs -ftest-coverage
       # when compiling.
@@ -37,7 +34,9 @@ function(effcee_default_c_compile_options TARGET)
           LINK_FLAGS "-static -static-libgcc")
       endif(WIN32)
     endif(NOT EFFCEE_ENABLE_SHARED_CRT)
-    target_link_libraries(${TARGET} PUBLIC ${CMAKE_THREAD_LIBS_INIT})
+    if (UNIX AND NOT MINGW)
+      target_link_libraries(${TARGET} PUBLIC -pthread)
+    endif()
   else()
     # disable warning C4800: 'int' : forcing value to bool 'true' or 'false'
     # (performance warning)
