@@ -50,8 +50,8 @@ TEST_P(ResultStatusTest, ConstructWithAnyStatus) {
   EXPECT_THAT(result.status(), Eq(GetParam()));
 }
 
-INSTANTIATE_TEST_CASE_P(AllStatus, ResultStatusTest,
-                        ValuesIn(AllStatusValues()), );
+INSTANTIATE_TEST_SUITE_P(AllStatus, ResultStatusTest,
+                         ValuesIn(AllStatusValues()));
 
 // Test two-argument constructor.
 
@@ -66,10 +66,10 @@ TEST_P(ResultStatusMessageTest, ConstructWithStatusAndMessage) {
   EXPECT_THAT(result.message(), Eq(std::get<1>(GetParam())));
 }
 
-INSTANTIATE_TEST_CASE_P(SampleStatusAndMessage, ResultStatusMessageTest,
-                        Combine(ValuesIn(AllStatusValues()),
-                                ValuesIn(std::vector<std::string>{
-                                    "", "foo bar", "and, how!\n"})), );
+INSTANTIATE_TEST_SUITE_P(SampleStatusAndMessage, ResultStatusMessageTest,
+                         Combine(ValuesIn(AllStatusValues()),
+                                 ValuesIn(std::vector<std::string>{
+                                     "", "foo bar", "and, how!\n"})));
 
 TEST(ResultConversionTest, OkStatusConvertsToTrue) {
   Result result(Status::Ok);
@@ -87,8 +87,8 @@ TEST_P(ResultFailConversionTest, AnyFailStatusConvertsToFalse) {
   EXPECT_THAT(as_bool, Eq(false));
 }
 
-INSTANTIATE_TEST_CASE_P(FailStatus, ResultFailConversionTest,
-                        ValuesIn(AllFailStatusValues()), );
+INSTANTIATE_TEST_SUITE_P(FailStatus, ResultFailConversionTest,
+                         ValuesIn(AllFailStatusValues()));
 
 TEST(ResultMessage, SetMessageReturnsSelf) {
   Result result(Status::Ok);
