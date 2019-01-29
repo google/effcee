@@ -50,7 +50,7 @@ TEST_P(CheckTypeTest, ConstructWithAnyType) {
   EXPECT_THAT(check.type(), Eq(GetParam()));
 }
 
-INSTANTIATE_TEST_CASE_P(AllTypes, CheckTypeTest, ValuesIn(AllTypes()), );
+INSTANTIATE_TEST_SUITE_P(AllTypes, CheckTypeTest, ValuesIn(AllTypes()));
 
 using CheckParamTest = ::testing::TestWithParam<StringPiece>;
 
@@ -62,10 +62,10 @@ TEST_P(CheckParamTest, ConstructWithSampleParamValue) {
   EXPECT_THAT(check.param().data(), Eq(GetParam().data()));
 }
 
-INSTANTIATE_TEST_CASE_P(SampleParams, CheckParamTest,
-                        ValuesIn(std::vector<StringPiece>{
-                            "", "a b c", "The wind {{in}} the willows\n",
-                            "Bring me back to the mountains of yore."}), );
+INSTANTIATE_TEST_SUITE_P(SampleParams, CheckParamTest,
+                         ValuesIn(std::vector<StringPiece>{
+                             "", "a b c", "The wind {{in}} the willows\n",
+                             "Bring me back to the mountains of yore."}));
 
 // Equality operator
 TEST(CheckEqualityTest, TrueWhenAllComponentsSame) {
@@ -223,10 +223,10 @@ std::vector<std::pair<std::string, Type>> AllCheckTypesAsPairs() {
   };
 }
 
-INSTANTIATE_TEST_CASE_P(AllCheckTypes, ParseChecksTypeTest,
-                        Combine(ValuesIn(std::vector<std::string>{"CHECK",
-                                                                  "FOO"}),
-                                ValuesIn(AllCheckTypesAsPairs())), );
+INSTANTIATE_TEST_SUITE_P(AllCheckTypes, ParseChecksTypeTest,
+                         Combine(ValuesIn(std::vector<std::string>{"CHECK",
+                                                                   "FOO"}),
+                                 ValuesIn(AllCheckTypesAsPairs())));
 
 using ParseChecksTypeFailTest = ::testing::TestWithParam<
     std::tuple<std::string, std::pair<std::string, Type>>>;
@@ -241,10 +241,10 @@ TEST_P(ParseChecksTypeFailTest, FailureWhenNoColon) {
   EXPECT_THAT(parsed.second, Eq(CheckList{}));
 }
 
-INSTANTIATE_TEST_CASE_P(AllCheckTypes, ParseChecksTypeFailTest,
-                        Combine(ValuesIn(std::vector<std::string>{"CHECK",
-                                                                  "FOO"}),
-                                ValuesIn(AllCheckTypesAsPairs())), );
+INSTANTIATE_TEST_SUITE_P(AllCheckTypes, ParseChecksTypeFailTest,
+                         Combine(ValuesIn(std::vector<std::string>{"CHECK",
+                                                                   "FOO"}),
+                                 ValuesIn(AllCheckTypesAsPairs())));
 
 TEST(ParseChecks, CheckSameCantBeFirst) {
   const auto parsed = ParseChecks("CHECK-SAME: now", Options());
@@ -286,7 +286,7 @@ TEST_P(CheckMatchTest, Samples) {
   EXPECT_TRUE(vars.empty());
 }
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
     Simple, CheckMatchTest,
     ValuesIn(std::vector<CheckMatchCase>{
         {"hello", Check(Type::Simple, "hello"), true, "", "hello"},
@@ -310,8 +310,7 @@ INSTANTIATE_TEST_CASE_P(
         {"hello", Check(Type::Not, "hello"), true, "", "hello"},
         {"world", Check(Type::Not, "hello"), false, "world", ""},
         {"in hello now", Check(Type::Not, "hello"), true, " now", "hello"},
-    }), );
-
+    }));
 
 // Check::Part::Regex
 
