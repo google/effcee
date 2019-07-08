@@ -60,7 +60,7 @@ class Cursor {
       ++line_num_;
     }
     return *this;
-  };
+  }
 
  private:
   // The remaining text, after all previous advancements.  References the
