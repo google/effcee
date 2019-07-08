@@ -12,35 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# For cross-compilation, we need to use find_host_package
-# in the remaining setup. But if not cross-compiling, then we
-# need to alias find_host_package to find_package.
-# Similar for find_host_program.
 if(NOT COMMAND find_host_package)
   macro(find_host_package)
     find_package(${ARGN})
   endmacro()
 endif()
-if(NOT COMMAND find_host_program)
-  macro(find_host_program)
-    find_program(${ARGN})
-  endmacro()
-endif()
 
-if (ANDROID)
-  # For android let's preemptively find the correct packages so that
-  # child projects (e.g. googletest) do not fail to find them.
-  find_host_package(PythonInterp)
-endif()
-
-foreach(PROGRAM echo python)
-  string(TOUPPER ${PROGRAM} PROG_UC)
-  if (ANDROID)
-    find_host_program(${PROG_UC}_EXE ${PROGRAM} REQUIRED)
-  else()
-    find_program(${PROG_UC}_EXE ${PROGRAM} REQUIRED)
-  endif()
-endforeach(PROGRAM)
+find_host_package(PythonInterp 3 REQUIRED)
 
 option(DISABLE_RTTI "Disable RTTI in builds")
 if(DISABLE_RTTI)

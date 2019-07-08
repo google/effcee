@@ -126,7 +126,7 @@ for more information. See also the [`AUTHORS`](AUTHORS) and
 
 Effcee depends on the [RE2][RE2] regular expression library.
 
-Effcee tests depend on [Googletest][Googletest] and [Python][Python].
+Effcee tests depend on [Googletest][Googletest] and [Python 3][Python].
 
 In the following sections, `$SOURCE_DIR` is the directory containing the
 Effcee source code.
@@ -229,7 +229,7 @@ installed regardless of your OS:
 
 - A compiler supporting C++11.
 - [CMake][CMake]: for generating compilation targets.
-- [Python][Python]: for a test script.
+- [Python 3][Python]: for a test script.
 
 On Linux, if cross compiling to Windows:
 - [MinGW][MinGW]: A GCC-based cross compiler targeting Windows
