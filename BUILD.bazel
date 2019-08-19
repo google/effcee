@@ -1,0 +1,91 @@
+package(
+    default_visibility = ["//visibility:public"],
+)
+
+# Description:
+#
+# Effcee is a C++ library for stateful pattern matching of strings inspired by
+# LLVM's FileCheck.
+
+licenses(["notice"])  # Apache 2.0
+
+exports_files([
+    "CHANGES",
+    "LICENSE",
+])
+
+cc_library(
+    name = "effcee",
+    srcs = glob(
+        ["effcee/*.cc"],
+        exclude = ["effcee/*_test.cc"],
+    ),
+    hdrs = glob(["effcee/*.h"]),
+    compatible_with = [
+    ],
+    deps = [
+        "@com_googlesource_code_re2//:re2",
+    ],
+)
+
+# Tests
+
+cc_test(
+    name = "check_test",
+    srcs = ["effcee/check_test.cc"],
+    deps = [
+        ":effcee",
+        "@com_google_googletest//:gtest_main",
+        "@com_google_googletest//:gtest",
+    ],
+)
+
+cc_test(
+    name = "cursor_test",
+    srcs = ["effcee/cursor_test.cc"],
+    deps = [
+        ":effcee",
+        "@com_google_googletest//:gtest_main",
+        "@com_google_googletest//:gtest",
+    ],
+)
+
+cc_test(
+    name = "diagnostic_test",
+    srcs = ["effcee/diagnostic_test.cc"],
+    deps = [
+        ":effcee",
+        "@com_google_googletest//:gtest_main",
+        "@com_google_googletest//:gtest",
+    ],
+)
+
+cc_test(
+    name = "match_test",
+    srcs = ["effcee/match_test.cc"],
+    deps = [
+        ":effcee",
+        "@com_google_googletest//:gtest_main",
+        "@com_google_googletest//:gtest",
+    ],
+)
+
+cc_test(
+    name = "options_test",
+    srcs = ["effcee/options_test.cc"],
+    deps = [
+        ":effcee",
+        "@com_google_googletest//:gtest_main",
+        "@com_google_googletest//:gtest",
+    ],
+)
+
+cc_test(
+    name = "result_test",
+    srcs = ["effcee/result_test.cc"],
+    deps = [
+        ":effcee",
+        "@com_google_googletest//:gtest_main",
+        "@com_google_googletest//:gtest",
+    ],
+)
