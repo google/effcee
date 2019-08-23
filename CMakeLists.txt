@@ -34,6 +34,7 @@ include(cmake/utils.cmake)
 
 add_subdirectory(third_party)
 add_subdirectory(effcee)
+add_subdirectory(fuzzer)
 
 if(${EFFCEE_BUILD_SAMPLES})
   add_subdirectory(examples)
