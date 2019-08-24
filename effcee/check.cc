@@ -130,10 +130,10 @@ bool Check::Matches(StringPiece* input, StringPiece* captured,
 }
 
 namespace {
-// Returns a parts list for the given pattern.  This splits out regular
-// expressions as delimited by {{ and }}, and also variable uses and
-// definitions.
-Check::Parts PartsForPattern(StringPiece pattern) {
+// Returns a Result and a parts list for the given pattern.  This splits out
+// regular expressions as delimited by {{ and }}, and also variable uses and
+// definitions.  This can fail when a regular expression is invalid.
+std::pair<Result, Check::Parts> PartsForPattern(StringPiece pattern) {
   Check::Parts parts;
   StringPiece fixed, regex, var;
 
@@ -160,6 +160,12 @@ Check::Parts PartsForPattern(StringPiece pattern) {
       }
       if (!regex.empty()) {
         parts.emplace_back(make_unique<Check::Part>(Type::Regex, regex));
+        if (parts.back()->NumCapturingGroups() < 0) {
+          return std::make_pair(
+              Result(Result::Status::BadRule,
+                     std::string("invalid regex: ") + ToString(regex)),
+              Check::Parts());
+        }
       }
     } else if (var_exists && (!regex_exists || var_start < regex_start)) {
       const auto consumed =
@@ -191,7 +197,7 @@ Check::Parts PartsForPattern(StringPiece pattern) {
     }
   }
 
-  return parts;
+  return std::make_pair(Result(Result::Status::Ok), std::move(parts));
 }
 
 }  // namespace
@@ -234,8 +240,9 @@ std::pair<Result, CheckList> ParseChecks(StringPiece str,
     StringPiece suffix;
     if (RE2::PartialMatch(line, regexp, &suffix, &matched_param)) {
       const Type type = TypeForSuffix(suffix);
-      auto parts(PartsForPattern(matched_param));
-      check_list.push_back(Check(type, matched_param, std::move(parts)));
+      auto parts = PartsForPattern(matched_param);
+      if (!parts.first) return std::make_pair(parts.first, CheckList());
+      check_list.push_back(Check(type, matched_param, std::move(parts.second)));
     }
     cursor.AdvanceLine();
   }
