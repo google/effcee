@@ -188,6 +188,14 @@ std::pair<Result, Check::Parts> PartsForPattern(StringPiece pattern) {
           StringPiece expression = var.substr(colon + 1, StringPiece::npos);
           parts.emplace_back(
               make_unique<Check::Part>(Type::VarDef, var, name, expression));
+          if (parts.back()->NumCapturingGroups() < 0) {
+            return std::make_pair(
+                Result(
+                    Result::Status::BadRule,
+                    std::string("invalid regex in variable definition for ") +
+                        ToString(name) + ": " + ToString(expression)),
+                Check::Parts());
+          }
         }
       }
     } else {

@@ -246,10 +246,18 @@ INSTANTIATE_TEST_SUITE_P(AllCheckTypes, ParseChecksTypeFailTest,
                                                                    "FOO"}),
                                  ValuesIn(AllCheckTypesAsPairs())));
 
-TEST(ParseChecks, BadRegexpFails) {
+TEST(ParseChecks, BadRegexpMatchTrailingSlashFails) {
   const auto parsed = ParseChecks("CHECK: {{\\}}", Options());
   EXPECT_THAT(parsed.first.status(), Eq(Status::BadRule));
   EXPECT_THAT(parsed.first.message(), HasSubstr("invalid regex: \\"));
+  EXPECT_THAT(parsed.second, Eq(CheckList({})));
+}
+
+TEST(ParseChecks, BadRegexpVardefUnboundOptionalFails) {
+  const auto parsed = ParseChecks("CHECK: [[VAR:?]]", Options());
+  EXPECT_THAT(parsed.first.status(), Eq(Status::BadRule));
+  EXPECT_THAT(parsed.first.message(),
+              HasSubstr("invalid regex in variable definition for VAR: ?"));
   EXPECT_THAT(parsed.second, Eq(CheckList({})));
 }
 
