@@ -1,5 +1,8 @@
 Revision history for Effcee
 
+v2019.1-dev 2019-09-18
+ - Start v2019.1-dev
+
 v2019.0 2019-09-18
  - Add optional tool effcee-fuzz to help run fuzzer cases.
  - Build updates
