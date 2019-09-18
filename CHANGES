@@ -1,8 +1,16 @@
 Revision history for Effcee
 
-v2018.2-dev 2018-10-05
+v2019.0 2019-09-18
+ - Add optional tool effcee-fuzz to help run fuzzer cases.
+ - Build updates
+   - Add Bazel build rules
+   - Add Clang warning -Wextra-semi
+   - Require Python3
+   - Fix MinGW cross-compile
+   - Fix tests to work with latest googletest
  - Fixes:
-   #23: Avoid StringPiece::as_string to enhance portability.
+   - Fail parsing checks when regular expressions are invalid.
+   - #23: Avoid StringPiece::as_string to enhance portability.
 
 v2018.1 2018-10-05
  - Require CMake 3.1 or later
