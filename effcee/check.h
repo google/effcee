@@ -141,7 +141,7 @@ class Check {
   // Copy constructor.
   Check(const Check& other) : type_(other.type_), param_(other.param_) {
     for (const auto& part : other.parts_) {
-      parts_.push_back(make_unique<Part>(*part));
+      parts_.push_back(effcee::make_unique<Part>(*part));
     }
   }
   // Copy and move assignment.

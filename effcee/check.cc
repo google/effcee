@@ -63,7 +63,7 @@ int Check::Part::CountCapturingGroups() {
 }
 
 Check::Check(Type type, StringPiece param) : type_(type), param_(param) {
-  parts_.push_back(make_unique<Check::Part>(Part::Type::Fixed, param));
+  parts_.push_back(effcee::make_unique<Check::Part>(Part::Type::Fixed, param));
 }
 
 bool Check::Part::MightMatch(const VarMapping& vars) const {
@@ -156,10 +156,12 @@ std::pair<Result, Check::Parts> PartsForPattern(StringPiece pattern) {
                "Did not make forward progress for regex in check rule");
       }
       if (!fixed.empty()) {
-        parts.emplace_back(make_unique<Check::Part>(Type::Fixed, fixed));
+        parts.emplace_back(
+            effcee::make_unique<Check::Part>(Type::Fixed, fixed));
       }
       if (!regex.empty()) {
-        parts.emplace_back(make_unique<Check::Part>(Type::Regex, regex));
+        parts.emplace_back(
+            effcee::make_unique<Check::Part>(Type::Regex, regex));
         if (parts.back()->NumCapturingGroups() < 0) {
           return std::make_pair(
               Result(Result::Status::BadRule,
@@ -175,19 +177,21 @@ std::pair<Result, Check::Parts> PartsForPattern(StringPiece pattern) {
                "Did not make forward progress for var in check rule");
       }
       if (!fixed.empty()) {
-        parts.emplace_back(make_unique<Check::Part>(Type::Fixed, fixed));
+        parts.emplace_back(
+            effcee::make_unique<Check::Part>(Type::Fixed, fixed));
       }
       if (!var.empty()) {
         auto colon = var.find(":");
         // A colon at the end is useless anyway, so just make it a variable
         // use.
         if (colon == StringPiece::npos || colon == var.size() - 1) {
-          parts.emplace_back(make_unique<Check::Part>(Type::VarUse, var));
+          parts.emplace_back(
+              effcee::make_unique<Check::Part>(Type::VarUse, var));
         } else {
           StringPiece name = var.substr(0, colon);
           StringPiece expression = var.substr(colon + 1, StringPiece::npos);
-          parts.emplace_back(
-              make_unique<Check::Part>(Type::VarDef, var, name, expression));
+          parts.emplace_back(effcee::make_unique<Check::Part>(
+              Type::VarDef, var, name, expression));
           if (parts.back()->NumCapturingGroups() < 0) {
             return std::make_pair(
                 Result(
@@ -200,7 +204,7 @@ std::pair<Result, Check::Parts> PartsForPattern(StringPiece pattern) {
       }
     } else {
       // There is no regex, no var def, no var use.  Must be a fixed string.
-      parts.push_back(make_unique<Check::Part>(Type::Fixed, pattern));
+      parts.push_back(effcee::make_unique<Check::Part>(Type::Fixed, pattern));
       break;
     }
   }
