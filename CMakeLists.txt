@@ -31,6 +31,7 @@ find_package(Threads)
 
 include(cmake/setup_build.cmake)
 include(cmake/utils.cmake)
+include(GNUInstallDirs)
 
 add_subdirectory(third_party)
 add_subdirectory(effcee)
