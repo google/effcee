@@ -1,7 +1,12 @@
 Revision history for Effcee
 
 v2019.1-dev 2019-09-18
- - Start v2019.1-dev
+ - Build/CI/release updates
+   - GitHub repo: switch to 'main' branch, instead of 'master'
+   - Respect CMAKE_INSTALL_LIBDIR in installed Cmake files
+   - Travis-CI: On macOS run brew update first
+ - Fixes:
+   - protect make_unique with namespace
 
 v2019.0 2019-09-18
  - Add optional tool effcee-fuzz to help run fuzzer cases.
