@@ -1,6 +1,6 @@
 Revision history for Effcee
 
-v2019.1-dev 2019-09-18
+v2019.1 2020-06-16
  - Build/CI/release updates
    - GitHub repo: switch to 'main' branch, instead of 'master'
    - Respect CMAKE_INSTALL_LIBDIR in installed Cmake files
