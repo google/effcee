@@ -18,6 +18,7 @@
 #include <sstream>
 #include <string>
 
+#include "export.h"
 #include "re2/stringpiece.h"
 
 namespace effcee {
@@ -26,35 +27,38 @@ using StringPiece = re2::StringPiece;
 
 // Represents a position in a StringPiece, while tracking line number.
 class Cursor {
-
  public:
-  explicit Cursor(StringPiece str)
+  EFFCEE_EXPORT explicit Cursor(StringPiece str)
       : remaining_(str), line_num_(1) {}
 
-  StringPiece remaining() const { return remaining_; }
+  EFFCEE_EXPORT StringPiece remaining() const { return remaining_; }
   // Returns the current 1-based line number.
-  int line_num() const { return line_num_; }
+  EFFCEE_EXPORT int line_num() const { return line_num_; }
 
   // Returns true if the remaining text is empty.
-  bool Exhausted() const { return remaining_.empty(); }
+  EFFCEE_EXPORT bool Exhausted() const { return remaining_.empty(); }
 
   // Returns a string piece from the current position until the end of the line
   // or the end of input, up to and including the newline.
-  StringPiece RestOfLine() const {
+  EFFCEE_EXPORT StringPiece RestOfLine() const {
     const auto newline_pos = remaining_.find('\n');
-    return remaining_.substr(0, newline_pos + (newline_pos != StringPiece::npos));
+    return remaining_.substr(0,
+                             newline_pos + (newline_pos != StringPiece::npos));
   }
 
   // Advance |n| characters.  Does not adjust line count.  The next |n|
   // characters should not contain newlines if line numbering is to remain
   // up to date.  Returns this object.
-  Cursor& Advance(size_t n) { remaining_.remove_prefix(n); return *this; }
+  EFFCEE_EXPORT Cursor& Advance(size_t n) {
+    remaining_.remove_prefix(n);
+    return *this;
+  }
 
   // Advances the cursor by a line.  If no text remains, then does nothing.
   // Otherwise removes the first line (including newline) and increments the
   // line count.  If there is no newline then the remaining string becomes
   // empty.  Returns this object.
-  Cursor& AdvanceLine() {
+  EFFCEE_EXPORT Cursor& AdvanceLine() {
     if (remaining_.size()) {
       Advance(RestOfLine().size());
       ++line_num_;
@@ -73,6 +77,7 @@ class Cursor {
 // Returns string containing a description of the line containing a given
 // subtext, with a message, and a caret displaying the subtext position.
 // Assumes subtext does not contain a newline.
+EFFCEE_EXPORT
 inline std::string LineMessage(StringPiece text, StringPiece subtext,
                                StringPiece message) {
   Cursor c(text);

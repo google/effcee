@@ -26,10 +26,11 @@ namespace effcee {
 // status and the stringified message.
 class Diagnostic {
  public:
-  explicit Diagnostic(Result::Status status) : status_(status) {}
+  EFFCEE_EXPORT explicit Diagnostic(Result::Status status) : status_(status) {}
 
   // Copy constructor.
-  Diagnostic(const Diagnostic& other) : status_(other.status_), message_() {
+  EFFCEE_EXPORT Diagnostic(const Diagnostic& other)
+      : status_(other.status_), message_() {
     // We can't move an ostringstream.  As a fallback, we'd like to use the
     // std::ostringstream(std::string init_string) constructor.  However, that
     // initial string disappears inexplicably the first time we shift onto
@@ -47,7 +48,9 @@ class Diagnostic {
 
   // Converts this object to a result value containing the stored status and a
   // stringified copy of the message.
-  operator Result() const { return Result(status_, message_.str()); }
+  EFFCEE_EXPORT operator Result() const {
+    return Result(status_, message_.str());
+  }
 
  private:
   Result::Status status_;

@@ -22,6 +22,7 @@
 #include <vector>
 
 #include "effcee.h"
+#include "export.h"
 #include "make_unique.h"
 
 namespace effcee {
@@ -59,7 +60,7 @@ class Check {
       VarUse,  // A variable use
     };
 
-    Part(Type type, StringPiece param)
+    EFFCEE_EXPORT Part(Type type, StringPiece param)
         : type_(type),
           param_(param),
           name_(),
@@ -67,40 +68,44 @@ class Check {
           num_capturing_groups_(CountCapturingGroups()) {}
 
     // A constructor for a VarDef variant.
-    Part(Type type, StringPiece param, StringPiece name, StringPiece expr)
+    EFFCEE_EXPORT Part(Type type, StringPiece param, StringPiece name,
+                       StringPiece expr)
         : type_(type),
           param_(param),
           name_(name),
           expression_(expr),
           num_capturing_groups_(CountCapturingGroups()) {}
 
-    // Returns true if this part might match a target string.  The only case where
-    // this is false is for a VarUse part where the variable is not yet defined.
-    bool MightMatch(const VarMapping& vars) const;
+    // Returns true if this part might match a target string.  The only case
+    // where this is false is for a VarUse part where the variable is not yet
+    // defined.
+    EFFCEE_EXPORT bool MightMatch(const VarMapping& vars) const;
 
     // Returns a regular expression to match this part, given a mapping of
     // variable names to values.  If this part is a fixed string or variable use
     // then quoting has been applied.
-    std::string Regex(const VarMapping& vars) const;
+    EFFCEE_EXPORT std::string Regex(const VarMapping& vars) const;
 
     // Returns number of capturing subgroups in the regex for a Regex or VarDef
     // part, and 0 for other parts.
-    int NumCapturingGroups() const { return num_capturing_groups_; }
+    EFFCEE_EXPORT int NumCapturingGroups() const {
+      return num_capturing_groups_;
+    }
 
     // If this is a VarDef, then returns the name of the variable. Otherwise
     // returns an empty string.
-    StringPiece VarDefName() const { return name_; }
+    EFFCEE_EXPORT StringPiece VarDefName() const { return name_; }
 
     // If this is a VarUse, then returns the name of the variable. Otherwise
     // returns an empty string.
-    StringPiece VarUseName() const {
+    EFFCEE_EXPORT StringPiece VarUseName() const {
       return type_ == Type::VarUse ? param_ : "";
     }
 
    private:
     // Computes the number of capturing groups in this part. This is zero
     // for Fixed and VarUse parts.
-    int CountCapturingGroups();
+    EFFCEE_EXPORT int CountCapturingGroups();
 
     // The part type.
     Type type_;
@@ -121,31 +126,33 @@ class Check {
 
   // MSVC needs a default constructor.  However, a default-constructed Check
   // instance can't be used for matching.
-  Check() : type_(Type::Simple) {}
+  EFFCEE_EXPORT Check() : type_(Type::Simple) {}
 
   // Construct a Check object of the given type and fixed parameter string.
   // In particular, this retains a StringPiece reference to the |param|
   // contents, so that string storage should remain valid for the duration
   // of this object.
-  Check(Type type, StringPiece param);
+  EFFCEE_EXPORT Check(Type type, StringPiece param);
 
   // Construct a Check object of the given type, with given parameter string
   // and specified parts.
-  Check(Type type, StringPiece param, Parts&& parts)
+  EFFCEE_EXPORT Check(Type type, StringPiece param, Parts&& parts)
       : type_(type), param_(param), parts_(std::move(parts)) {}
 
   // Move constructor.
-  Check(Check&& other) : type_(other.type_), param_(other.param_) {
+  EFFCEE_EXPORT Check(Check&& other)
+      : type_(other.type_), param_(other.param_) {
     parts_.swap(other.parts_);
   }
   // Copy constructor.
-  Check(const Check& other) : type_(other.type_), param_(other.param_) {
+  EFFCEE_EXPORT Check(const Check& other)
+      : type_(other.type_), param_(other.param_) {
     for (const auto& part : other.parts_) {
       parts_.push_back(effcee::make_unique<Part>(*part));
     }
   }
   // Copy and move assignment.
-  Check& operator=(Check other) {
+  EFFCEE_EXPORT Check& operator=(Check other) {
     type_ = other.type_;
     param_ = other.param_;
     std::swap(parts_, other.parts_);
@@ -153,9 +160,9 @@ class Check {
   }
 
   // Accessors.
-  Type type() const { return type_; }
-  StringPiece param() const { return param_; }
-  const Parts& parts() const { return parts_; }
+  EFFCEE_EXPORT Type type() const { return type_; }
+  EFFCEE_EXPORT StringPiece param() const { return param_; }
+  EFFCEE_EXPORT const Parts& parts() const { return parts_; }
 
   // Tries to match the given string, using |vars| as the variable mapping
   // context.  A variable use, e.g. '[[X]]', matches the current value for
@@ -166,7 +173,8 @@ class Check {
   // of named variables in |vars| with the strings they matched. Otherwise
   // returns false and does not update |str| or |captured|.  Assumes this
   // instance is not default-constructed.
-  bool Matches(StringPiece* str, StringPiece* captured, VarMapping* vars) const;
+  EFFCEE_EXPORT bool Matches(StringPiece* str, StringPiece* captured,
+                             VarMapping* vars) const;
 
  private:
   // The type of check.
@@ -195,8 +203,8 @@ using CheckList = std::vector<Check>;
 // of recognized checks, taking |options| into account.  The result status
 // object indicates success, or failure with a message.
 // TODO(dneto): Only matches simple checks for now.
-std::pair<Result, CheckList> ParseChecks(StringPiece checks_string,
-                                         const Options& options);
+EFFCEE_EXPORT std::pair<Result, CheckList> ParseChecks(
+    StringPiece checks_string, const Options& options);
 
 }  // namespace effcee
 
