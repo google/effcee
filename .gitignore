@@ -5,8 +5,10 @@ out/
 *.swp
 *~
 compile_commands.json
+CMakeSettings.json
 .ycm_extra_conf.py
 cscope.*
 third_party/re2/
 third_party/googletest/
 .DS_Store
+.vs
