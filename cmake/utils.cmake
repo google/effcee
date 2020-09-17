@@ -49,7 +49,11 @@ endfunction(effcee_default_c_compile_options)
 
 function(effcee_default_compile_options TARGET)
   effcee_default_c_compile_options(${TARGET})
-  if (NOT "${MSVC}")
+  if ("${MSVC}")
+    if(BUILD_SHARED_LIBS)
+        target_compile_definitions(${TARGET} PRIVATE "EFFCEE_BUILDING_DLL=1")
+    endif()
+  else()
     # RE2's public header requires C++11.  So publicly required C++11
     target_compile_options(${TARGET} PUBLIC -std=c++11)
     if (NOT EFFCEE_ENABLE_SHARED_CRT)

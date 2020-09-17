@@ -16,6 +16,7 @@
 #define EFFCEE_EFFCEE_H
 
 #include <string>
+#include "export.h"
 #include "re2/re2.h"
 
 namespace effcee {
@@ -33,31 +34,31 @@ using StringPiece = re2::StringPiece;
 // Options for matching.
 class Options {
  public:
-  Options()
+  EFFCEE_EXPORT Options()
       : prefix_("CHECK"), input_name_("<stdin>"), checks_name_("<stdin>") {}
 
   // Sets rule prefix to a copy of |prefix|.  Returns this object.
-  Options& SetPrefix(StringPiece prefix) {
+  EFFCEE_EXPORT Options& SetPrefix(StringPiece prefix) {
     prefix_ = std::string(prefix.begin(), prefix.end());
     return *this;
   }
-  const std::string& prefix() const { return prefix_; }
+  EFFCEE_EXPORT const std::string& prefix() const { return prefix_; }
 
   // Sets the input name.  Returns this object.
   // Use this for file names, for example.
-  Options& SetInputName(StringPiece name) {
+  EFFCEE_EXPORT Options& SetInputName(StringPiece name) {
     input_name_ = std::string(name.begin(), name.end());
     return *this;
   }
-  const std::string& input_name() const { return input_name_; }
+  EFFCEE_EXPORT const std::string& input_name() const { return input_name_; }
 
   // Sets the checks input name.  Returns this object.
   // Use this for file names, for example.
-  Options& SetChecksName(StringPiece name) {
+  EFFCEE_EXPORT Options& SetChecksName(StringPiece name) {
     checks_name_ = std::string(name.begin(), name.end());
     return *this;
   }
-  const std::string& checks_name() const { return checks_name_; }
+  EFFCEE_EXPORT const std::string& checks_name() const { return checks_name_; }
 
  private:
   std::string prefix_;
@@ -77,20 +78,20 @@ class Result {
   };
 
   // Constructs a result with a given status.
-  explicit Result(Status status) : status_(status) {}
+  EFFCEE_EXPORT explicit Result(Status status) : status_(status) {}
   // Constructs a result with the given message.  Keeps a copy of the message.
-  Result(Status status, StringPiece message)
+  EFFCEE_EXPORT Result(Status status, StringPiece message)
       : status_(status), message_({message.begin(), message.end()}) {}
 
-  Status status() const { return status_; }
+  EFFCEE_EXPORT Status status() const { return status_; }
 
   // Returns true if the match was successful.
-  operator bool() const { return status_ == Status::Ok; }
+  EFFCEE_EXPORT operator bool() const { return status_ == Status::Ok; }
 
-  const std::string& message() const { return message_; }
+  EFFCEE_EXPORT const std::string& message() const { return message_; }
 
   // Sets the error message to a copy of |message|.  Returns this object.
-  Result& SetMessage(StringPiece message) {
+  EFFCEE_EXPORT Result& SetMessage(StringPiece message) {
     message_ = std::string(message.begin(), message.end());
     return *this;
   }
@@ -105,8 +106,8 @@ class Result {
 
 // Returns the result of attempting to match |text| against the pattern
 // program in |checks|, with the given |options|.
-Result Match(StringPiece text, StringPiece checks,
-             const Options& options = Options());
+EFFCEE_EXPORT Result Match(StringPiece text, StringPiece checks,
+                           const Options& options = Options());
 
 }  // namespace effcee
 
