@@ -14,6 +14,7 @@ exports_files([
     "LICENSE",
 ])
 
+## This is the main functionality.
 cc_library(
     name = "effcee",
     srcs = glob(
@@ -28,7 +29,31 @@ cc_library(
     ],
 )
 
-# Tests
+## An example binary showing usage
+cc_binary(
+    name = "effcee_example",
+    srcs = ["examples/main.cc"],
+    deps = [ ":effcee" ],
+)
+
+# Test effcee_example executable
+py_test(
+    name = "effcee_example_test",
+    srcs = ["examples/effcee-example-driver.py"],
+    main = "examples/effcee-example-driver.py",
+    data = [ ":effcee_example", "examples/example_data.txt" ],
+    args = [
+        "$(location effcee_example)",
+        "examples/example_data.txt",
+        "'CHECK: Hello'",
+        "'CHECK-SAME: world'",
+        "'CHECK-NEXT: Bees'",
+        "'CHECK-NOT: Sting'",
+        "'CHECK: Honey'",
+    ],
+)
+
+# Unit tests
 
 cc_test(
     name = "check_test",
