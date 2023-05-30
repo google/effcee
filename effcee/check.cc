@@ -118,7 +118,8 @@ bool Check::Matches(StringPiece* input, StringPiece* captured,
                                   captures.get(), num_captures);
   if (matched) {
     *captured = captures[0];
-    input->remove_prefix(captured->end() - input->begin());
+    size_t start_position = input->find(captures[0]);
+    input->remove_prefix(start_position + captures[0].size());
     // Update the variable mapping.
     for (auto& var_def_index : var_def_indices) {
       const int index = var_def_index.first;
