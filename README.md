@@ -148,6 +148,7 @@ git clone https://github.com/google/effcee $SOURCE_DIR
 cd $SOURCE_DIR/third_party
 git clone https://github.com/google/googletest.git
 git clone https://github.com/google/re2.git
+git clone https://github.com/abseil/abseil-cpp.git
 cd $SOURCE_DIR/
 ```
 
