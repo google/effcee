@@ -1,0 +1,9 @@
+module(name = "effcee")
+
+bazel_dep(
+    name = "googletest",
+    version = "1.14.0",
+    dev_dependency = True,
+)
+
+bazel_dep(name = "re2", version = "2024-04-01")
