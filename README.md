@@ -14,6 +14,7 @@ Effcee:
 -   Has few dependencies:
     -   The C++11 standard library, and
     -   [RE2][RE2] for regular expression matching.
+    -   [Abseil][Abseil] utilities for C++ (via RE2).
 
 ## Example
 
@@ -129,7 +130,9 @@ more information. See also the [`AUTHORS`](AUTHORS) and
 -   `third_party/`: third party open source packages, downloaded separately
 -   [`examples/`](examples): example programs
 
-Effcee depends on the [RE2][RE2] regular expression library.
+Effcee depends on:
+* the [RE2][RE2] regular expression library.
+* the [Abseil][Abseil] utility library for C++.
 
 Effcee tests depend on [Googletest][Googletest] and [Python 3][Python].
 
@@ -145,6 +148,7 @@ git clone https://github.com/google/effcee $SOURCE_DIR
 cd $SOURCE_DIR/third_party
 git clone https://github.com/google/googletest.git
 git clone https://github.com/google/re2.git
+git clone https://github.com/abseil/abseil-cpp.git
 cd $SOURCE_DIR/
 ```
 
@@ -303,4 +307,5 @@ We track bugs using GitHub -- click on the "Issues" button on
 [MinGW]: http://www.mingw.org/
 [Python]: https://www.python.org/
 [RE2]: https://github.com/google/re2
+[Abseil]: https://github.com/abseil/abseil-cpp
 [SPIRV-Tools]: https://github.com/KhronosGroup/SPIRV-Tools

@@ -10,5 +10,8 @@ CMakeSettings.json
 cscope.*
 third_party/re2/
 third_party/googletest/
+third_party/abseil-cpp/
+third_party/abseil_cpp/
+bazel-*
 .DS_Store
 .vs
