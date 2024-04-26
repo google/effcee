@@ -1,5 +1,13 @@
 module(name = "effcee")
 
+bazel_dep(name = "rules_python", version = "0.31.0")
+python = use_extension("@rules_python//python/extensions:python.bzl", "python")
+python.toolchain(
+    configure_coverage_tool = False,
+    ignore_root_user_error = True,
+    python_version = "3.11",
+)
+
 bazel_dep(
     name = "googletest",
     version = "1.14.0",
