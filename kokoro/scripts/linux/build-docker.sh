@@ -99,7 +99,7 @@ if [ $TOOL = "cmake" ]; then
   ctest --output-on-failure --timeout 300
   echo $(date): ctest completed.
 elif [ $TOOL = "bazel" ]; then
-  using bazel-5.0.0
+  using bazel-7.0.2
 
   echo $(date): Build everything...
   bazel build --cxxopt=-std=c++17 :all

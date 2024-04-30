@@ -12,4 +12,5 @@ third_party/googletest/
 third_party/abseil-cpp/
 third_party/abseil_cpp/
 bazel-*
+MODULE.bazel.lock
 .DS_Store
