@@ -33,6 +33,8 @@ git config --global --add safe.directory $ROOT_DIR
 
 . /bin/using.sh # Declare the bash `using` function for configuring toolchains.
 
+using python-3.12
+
 case $CONFIG in
   DEBUG|RELEASE)
     ;;
