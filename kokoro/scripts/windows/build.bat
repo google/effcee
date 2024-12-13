@@ -21,8 +21,11 @@ set SRC=%cd%\github\effcee
 set BUILD_TYPE=%1
 set VS_VERSION=%2
 
-:: Force usage of python 3.6
-set PATH=C:\python36;"C:\Program Files\cmake-3.23.1-windows-x86_64\bin";%PATH%
+:: Force usage of python 3.12
+set PATH=C:\python312;%PATH%
+set PATH=C:\cmake-3.31.2\bin;%PATH%
+
+cmake --version
 
 :: #########################################
 :: set up msvc build env
