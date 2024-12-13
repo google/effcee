@@ -77,7 +77,7 @@ function clean_dir() {
 /usr/bin/python3 utils/git-sync-deps
 
 if [ $TOOL = "cmake" ]; then
-  using cmake-3.26.3
+  using cmake-3.31.2
   using ninja-1.10.0
 
   BUILD_TYPE="Debug"
