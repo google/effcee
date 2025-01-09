@@ -258,8 +258,7 @@ runtime libraries.
 
 On Windows, the following tools should be installed and available on your path:
 
--   Visual Studio 2015 or later. Previous versions of Visual Studio are not
-    usable with RE2 or Googletest.
+-   Visual Studio 2022 or later. Support for VS 2019 is deprecated.
 -   Git - including the associated tools, Bash, `diff`.
 
 ### Build options
