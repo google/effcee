@@ -48,7 +48,7 @@ case $COMPILER in
     using clang-10.0.0
     ;;
   gcc)
-    using gcc-10
+    using gcc-13
     ;;
   *)
     die expected COMPILER to be clang or gcc
