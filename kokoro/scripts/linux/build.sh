@@ -52,7 +52,7 @@ docker run --rm -i \
   --env KOKORO_ARTIFACTS_DIR="${KOKORO_ARTIFACTS_DIR}" \
   --env BUILD_SHA="${BUILD_SHA}" \
   --entrypoint "${SCRIPT_DIR}/build-docker.sh" \
-  "gcr.io/shaderc-build/radial-build:latest"
+  "${LINUX_BUILDER_IMAGE-gcr.io/shaderc-build/radial-build}"
 RESULT=$?
 
 # This is important. If the permissions are not fixed, kokoro will fail
