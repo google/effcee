@@ -1,2 +1,14 @@
 # Enable Bzlmod for every Bazel command
 common --enable_bzlmod
+
+# https://github.com/bazelbuild/bazel/issues/8195
+build --incompatible_disallow_empty_glob=true
+
+# https://github.com/bazelbuild/bazel/issues/12821
+build --nolegacy_external_runfiles
+
+# https://github.com/bazelbuild/bazel/issues/23043.
+build --incompatible_autoload_externally=
+
+# https://github.com/bazelbuild/bazel/issues/10076
+build --incompatible_default_to_explicit_init_py
