@@ -1,5 +1,5 @@
 package(
-    default_visibility = ["//visibility:public"],
+    default_visibility = ["//visibility:private"],
 )
 
 # Description:
@@ -12,7 +12,9 @@ licenses(["notice"])  # Apache 2.0
 exports_files([
     "CHANGES",
     "LICENSE",
-])
+],
+    visibility = ["//visibility:public"],
+)
 
 ## This is the main functionality.
 cc_library(
@@ -27,6 +29,7 @@ cc_library(
     deps = [
         "@re2//:re2",
     ],
+    visibility = ["//visibility:public"],
 )
 
 ## An example binary showing usage
@@ -51,6 +54,7 @@ py_test(
         "'CHECK-NOT: Sting'",
         "'CHECK: Honey'",
     ],
+    size = "small",
 )
 
 # Unit tests
@@ -63,6 +67,7 @@ cc_test(
         "@googletest//:gtest_main",
         "@googletest//:gtest",
     ],
+    size = "small",
 )
 
 cc_test(
@@ -73,6 +78,7 @@ cc_test(
         "@googletest//:gtest_main",
         "@googletest//:gtest",
     ],
+    size = "small",
 )
 
 cc_test(
@@ -83,6 +89,7 @@ cc_test(
         "@googletest//:gtest_main",
         "@googletest//:gtest",
     ],
+    size = "small",
 )
 
 cc_test(
@@ -93,6 +100,7 @@ cc_test(
         "@googletest//:gtest_main",
         "@googletest//:gtest",
     ],
+    size = "small",
 )
 
 cc_test(
@@ -103,6 +111,7 @@ cc_test(
         "@googletest//:gtest_main",
         "@googletest//:gtest",
     ],
+    size = "small",
 )
 
 cc_test(
@@ -113,4 +122,5 @@ cc_test(
         "@googletest//:gtest_main",
         "@googletest//:gtest",
     ],
+    size = "small",
 )
