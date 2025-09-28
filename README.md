@@ -258,7 +258,7 @@ runtime libraries.
 
 On Windows, the following tools should be installed and available on your path:
 
--   Visual Studio 2022 or later. Support for VS 2019 is deprecated.
+-   Visual Studio 2022 or later.
 -   Git - including the associated tools, Bash, `diff`.
 
 ### Build options

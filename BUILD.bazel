@@ -3,6 +3,10 @@ load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("@rules_cc//cc:cc_test.bzl", "cc_test")
 load("@rules_python//python:defs.bzl", "py_test")
 
+package(
+    default_visibility = ["//visibility:private"],
+)
+
 # Description:
 #
 # Effcee is a C++ library for stateful pattern matching of strings inspired by
@@ -13,7 +17,9 @@ licenses(["notice"])  # Apache 2.0
 exports_files([
     "CHANGES",
     "LICENSE",
-])
+],
+    visibility = ["//visibility:public"],
+)
 
 ## This is the main functionality.
 cc_library(
@@ -27,6 +33,7 @@ cc_library(
     deps = [
         "@re2",
     ],
+    visibility = ["//visibility:public"],
 )
 
 ## An example binary showing usage
@@ -54,6 +61,7 @@ py_test(
         ":effcee_example",
     ],
     main = "examples/effcee-example-driver.py",
+    size = "small",
 )
 
 # Unit tests
@@ -66,6 +74,7 @@ cc_test(
         "@googletest//:gtest",
         "@googletest//:gtest_main",
     ],
+    size = "small",
 )
 
 cc_test(
@@ -76,6 +85,7 @@ cc_test(
         "@googletest//:gtest",
         "@googletest//:gtest_main",
     ],
+    size = "small",
 )
 
 cc_test(
@@ -86,6 +96,7 @@ cc_test(
         "@googletest//:gtest",
         "@googletest//:gtest_main",
     ],
+    size = "small",
 )
 
 cc_test(
@@ -96,6 +107,7 @@ cc_test(
         "@googletest//:gtest",
         "@googletest//:gtest_main",
     ],
+    size = "small",
 )
 
 cc_test(
@@ -106,6 +118,7 @@ cc_test(
         "@googletest//:gtest",
         "@googletest//:gtest_main",
     ],
+    size = "small",
 )
 
 cc_test(
@@ -116,4 +129,5 @@ cc_test(
         "@googletest//:gtest",
         "@googletest//:gtest_main",
     ],
+    size = "small",
 )
