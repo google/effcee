@@ -33,6 +33,7 @@ cd $SRC
 /usr/bin/python3 utils/git-sync-deps
 
 # Get bazel 7.0.2
+gcloud config set auth/disable_credentials True
 gcloud storage cp gs://bazel/7.0.2/release/bazel-7.0.2-darwin-x86_64 .
 chmod +x bazel-7.0.2-darwin-x86_64
 
