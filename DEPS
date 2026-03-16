@@ -3,11 +3,11 @@ use_relative_paths = True
 vars = {
   'github': 'https://github.com',
 
-  'abseil_revision': '8e45685002488b55f24cb67a795eaa8d1c3297a1',
+  'abseil_revision': '0a7fe7e8da159b3bbbb39c9fa460bb2f7ba49dfc',
 
-  'googletest_revision': 'f625681bc4086c35099475f0d17e161f1c6ac9a1',
+  'googletest_revision': '94be250af7e14c58dcbf476972d2d7141551ff67',
 
-  're2_revision': '03da4fc0857c285e3a26782f6bc8931c4c950df4',
+  're2_revision': '972a15cedd008d846f1a39b2e88ce48d7f166cbd',
 }
 
 deps = {
