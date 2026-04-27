@@ -48,7 +48,7 @@ case $COMPILER in
     using clang-18
     ;;
   gcc)
-    using gcc-13
+    using gcc-15
     ;;
   *)
     die expected COMPILER to be clang or gcc
