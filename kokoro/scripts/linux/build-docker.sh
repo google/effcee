@@ -45,7 +45,7 @@ esac
 
 case $COMPILER in
   clang)
-    using clang-13.0.1
+    using clang-18
     ;;
   gcc)
     using gcc-13
