@@ -29,7 +29,7 @@ function die {
 # This is required to run any git command in the docker since owner will
 # have changed between the clone environment, and the docker container.
 # Marking the root of the repo as safe for ownership changes.
-git config --global --add safe.directory $ROOT_DIR
+git config --global --add safe.directory '*'
 
 . /bin/using.sh # Declare the bash `using` function for configuring toolchains.
 
@@ -101,7 +101,7 @@ if [ $TOOL = "cmake" ]; then
   ctest --output-on-failure --timeout 300
   echo $(date): ctest completed.
 elif [ $TOOL = "bazel" ]; then
-  using bazel-7.0.2
+  using bazel-7.4.0
 
   echo $(date): Build everything...
   bazel build --cxxopt=-std=c++17 :all
