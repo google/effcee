@@ -44,6 +44,7 @@ py_test(
     name = "effcee_example_test",
     srcs = ["examples/effcee-example-driver.py"],
     main = "examples/effcee-example-driver.py",
+    legacy_create_init = False,
     data = [ ":effcee_example", "examples/example_data.txt" ],
     args = [
         "$(location effcee_example)",
