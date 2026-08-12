@@ -1,4 +1,4 @@
-module(name = "effcee", version = "0.1")
+module(name = "effcee", version = "1.2026.0")
 """
 Effcee is a C++ library for stateful pattern matching of strings inspired by
 LLVM's FileCheck.

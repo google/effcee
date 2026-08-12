@@ -24,8 +24,6 @@ cc_library(
         exclude = ["effcee/*_test.cc"],
     ),
     hdrs = glob(["effcee/*.h"]),
-    compatible_with = [
-    ],
     deps = [
         "@re2//:re2",
     ],

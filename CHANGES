@@ -1,5 +1,10 @@
 Revision history for Effcee
 
+v1.2026.0 2026-08-12
+ - Switch to Semver-compatible 1.<YEAR>.<NUM> versioning.
+ - Use Python 3.12
+ - Use Bazel 8.7, including setting up a proper MODULE.bazel
+
 v2023.0-dev 2020-06-16
  - Add dependency on Abseil
  - Set up Kokoro bots
