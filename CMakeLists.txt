@@ -1,5 +1,10 @@
 cmake_minimum_required(VERSION 3.22.1)
-project(effcee C CXX)
+project(effcee
+  VERSION 1.2026.0
+  LANGUAGES C CXX
+  # When upgrading to CMake 4.3, add SPDX_LICENSE Apache-2.0
+)
+
 enable_testing()
 
 # Require at least C++17
