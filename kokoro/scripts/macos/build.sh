@@ -37,11 +37,7 @@ esac
 # Marking the root of the repo as safe for ownership changes.
 git config --global --add safe.directory $SRC
 
-# Get NINJA.
-wget -q https://github.com/ninja-build/ninja/releases/download/v1.10.0/ninja-mac.zip
-unzip -q ninja-mac.zip
-chmod +x ninja
-export PATH="$PWD:$PATH"
+# ninja and cmake are on the PATH
 
 cd $SRC
 python3 utils/git-sync-deps
